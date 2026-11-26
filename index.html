@@ -1,0 +1,2571 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Omniverse - Kitoblar Portali va Do'stlar Chati</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Kalam:wght@300;400;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #030712 0%, #0b132b 35%, #0f172a 70%, #1e1b4b 100%);
+      background-size: 300% 300%;
+      animation: gradientBG 18s ease infinite;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: #f8fafc;
+    }
+
+    .font-outfit { font-family: 'Outfit', sans-serif; }
+    .font-notebook { font-family: 'Kalam', cursive; }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Qora tuynuk (Black Hole / Vortex) animatsiyasi overlay */
+    .vortex-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(3,7,18,0.99) 0%, rgba(15, 23, 42, 1) 100%);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 150;
+      transform: scale(2.2);
+      transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1), transform 0.55s cubic-bezier(0.7, 0, 0.3, 1);
+    }
+
+    .vortex-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+      transform: scale(0.15) rotate(360deg);
+      border-radius: 50%;
+    }
+
+    .vortex-overlay.closing {
+      opacity: 1;
+      pointer-events: all;
+      transform: scale(3.2) rotate(720deg);
+      border-radius: 0%;
+    }
+
+    /* Neon nurlanuvchi matn */
+    .glow-text {
+      text-shadow: 0 0 20px rgba(56, 189, 248, 0.65),
+                   0 0 40px rgba(56, 189, 248, 0.45),
+                   0 0 60px rgba(14, 165, 233, 0.25);
+      animation: neonPulse 2.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes neonPulse {
+      from {
+        text-shadow: 0 0 15px rgba(56, 189, 248, 0.5), 0 0 30px rgba(56, 189, 248, 0.3);
+        transform: scale(1);
+      }
+      to {
+        text-shadow: 0 0 30px rgba(56, 189, 248, 0.85), 0 0 60px rgba(14, 165, 233, 0.65);
+        transform: scale(1.02);
+      }
+    }
+
+    /* Shishasimon karta (Glassmorphism) */
+    .glass-card {
+      background: rgba(15, 23, 42, 0.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65),
+                  0 0 30px rgba(56, 189, 248, 0.08);
+    }
+
+    /* Input xatosi */
+    .input-error {
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.4) !important;
+      animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    /* Notebook yozuv varag'i (Daftar ko'rinishi) */
+    .notebook-paper {
+      background-color: #fffde7;
+      background-image: linear-gradient(#e2e8f0 1px, transparent 1px);
+      background-size: 100% 2.2rem;
+      line-height: 2.2rem;
+      color: #0f172a;
+      border-left: 3px solid #ef4444;
+      padding-left: 2rem;
+    }
+
+    /* Minecraft uslubidagi yog'och javon */
+    .mc-bookshelf {
+      background: linear-gradient(135deg, #3d2314 0%, #29160a 100%);
+      border: 6px solid #1a0e05;
+      box-shadow: inset 0 0 25px rgba(0,0,0,0.85), 0 15px 35px rgba(0,0,0,0.6);
+      position: relative;
+    }
+
+    .book-spine-card {
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .book-spine-card:hover {
+      transform: translateY(-8px) scale(1.03);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.5), 0 0 20px rgba(251, 191, 36, 0.3);
+    }
+
+    /* Aylanuvchi kitoblar */
+    .books-orbit-container {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4.5rem;
+    }
+
+    .orbiting-book {
+      position: absolute;
+      width: 24px;
+      height: 32px;
+      background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+      border: 2px solid #fdba74;
+      border-radius: 4px 6px 6px 4px;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.75), 
+                  inset -2px 0 0 rgba(255, 255, 255, 0.35),
+                  0 0 18px rgba(251, 146, 60, 0.6);
+      top: 50%;
+      left: 50%;
+      margin-top: -16px;
+      margin-left: -12px;
+      transform-origin: center center;
+      animation: orbitRotate 15s linear infinite;
+      z-index: 20;
+    }
+
+    .orbiting-book::before {
+      content: '';
+      position: absolute;
+      top: 3px; left: 2px; right: 2px; height: 4px;
+      background: #fef08a;
+      box-shadow: 0 17px 0 #fef08a;
+      border-radius: 1px;
+    }
+
+    .orbiting-book::after {
+      content: '';
+      position: absolute;
+      left: -3px; top: 0; bottom: 0; width: 4px;
+      background: #450a0a;
+      border-radius: 2px 0 0 2px;
+    }
+
+    .orbiting-book:nth-child(2n) {
+      background: linear-gradient(135deg, #16a34a 0%, #166534 100%);
+      border-color: #86efac;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.75), inset -2px 0 0 rgba(255,255,255,0.35), 0 0 18px rgba(34, 197, 94, 0.6);
+    }
+
+    .orbiting-book:nth-child(3n) {
+      background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+      border-color: #93c5fd;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.75), inset -2px 0 0 rgba(255,255,255,0.35), 0 0 18px rgba(59, 130, 246, 0.6);
+    }
+
+    @keyframes orbitRotate {
+      from { transform: rotate(var(--angle)) translateX(var(--radius)) rotate(calc(-1 * var(--angle))); }
+      to { transform: rotate(calc(var(--angle) + 360deg)) translateX(var(--radius)) rotate(calc(-1 * (var(--angle) + 360deg))); }
+    }
+
+    /* MINECRAFT TOTEM ANIMATSIYASI */
+    .totem-overlay {
+      position: fixed; inset: 0;
+      background: rgba(3, 7, 18, 0.90);
+      backdrop-filter: blur(14px);
+      z-index: 200;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    .totem-overlay.active { opacity: 1; pointer-events: all; }
+
+    .totem-icon {
+      width: 130px; height: 150px;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #78350f 100%);
+      border: 4px solid #fef08a;
+      border-radius: 20px 20px 45px 45px;
+      box-shadow: 0 0 60px #fbbf24, inset 0 0 25px #fff;
+      position: relative;
+      animation: totemPop 1.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    .totem-icon::before {
+      content: '🗿'; font-size: 85px; position: absolute;
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      filter: drop-shadow(0 0 12px #fef08a);
+    }
+
+    @keyframes totemPop {
+      0% { transform: scale(0.1) rotate(-35deg); opacity: 0; }
+      50% { transform: scale(1.45) rotate(15deg); opacity: 1; filter: brightness(2.2); }
+      75% { transform: scale(0.9) rotate(-5deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    .totem-particles {
+      position: absolute; width: 320px; height: 320px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(251,191,36,0.65) 0%, rgba(245,158,11,0) 70%);
+      animation: pulseGlow 1.2s infinite alternate;
+    }
+    @keyframes pulseGlow {
+      from { transform: scale(0.9); opacity: 0.6; }
+      to { transform: scale(1.15); opacity: 1; }
+    }
+
+    /* Toast notification */
+    #globalToast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 300;
+      transform: translateY(120%); opacity: 0;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    #globalToast.show {
+      transform: translateY(0); opacity: 1;
+    }
+
+    /* Modal standard */
+    .custom-modal {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(3, 7, 18, 0.85);
+      backdrop-filter: blur(12px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 1rem; opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .custom-modal.open { opacity: 1; pointer-events: all; }
+  </style>
+</head>
+<body class="relative flex flex-col items-center justify-between min-h-screen p-4 sm:p-6">
+
+  <!-- QORA TUYNUK (VORTEX) OVERLAY -->
+  <div id="vortexOverlay" class="vortex-overlay"></div>
+
+  <!-- MINECRAFT TOTEM ANIMATSIYA OVERLAY -->
+  <div id="totemOverlay" class="totem-overlay">
+    <div class="totem-particles"></div>
+    <div class="totem-icon"></div>
+    <h2 class="font-outfit text-3xl font-extrabold text-amber-300 mt-6 animate-bounce">JANG QABUL QILINDI!</h2>
+    <p class="text-slate-300 text-sm mt-1">Imlo arenasi tayyorlanmoqda...</p>
+  </div>
+
+  <!-- GLOBAL TOAST NOTIFICATION -->
+  <div id="globalToast" class="glass-card px-5 py-3 rounded-2xl border border-sky-500/40 shadow-2xl flex items-center gap-3">
+    <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+    <span id="toastMessage" class="text-xs sm:text-sm font-medium text-slate-100">Xabar matni</span>
+  </div>
+
+  <!-- YUQORI O'NG BURCHAKDA TIL ALMASHTIRGICH (GLOBAL HEADER) -->
+  <header class="w-full max-w-6xl flex justify-between items-center py-3 px-4 z-40">
+    <div class="flex items-center gap-2">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white font-bold text-base shadow-lg shadow-sky-500/30">
+        <i class="fa-solid fa-book-sparkles"></i>
+      </div>
+      <span class="font-outfit font-extrabold text-lg sm:text-xl bg-gradient-to-r from-sky-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">
+        Omniverse
+      </span>
+    </div>
+
+    <!-- Til tanlash tugmalari -->
+    <div class="flex items-center gap-1 bg-slate-900/90 border border-slate-700/80 p-1 rounded-2xl shadow-xl backdrop-blur-md">
+      <button onclick="setLanguage('uz')" id="langBtnUz" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-sky-500 text-white shadow">UZ</button>
+      <button onclick="setLanguage('ru')" id="langBtnRu" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition-all">RU</button>
+      <button onclick="setLanguage('en')" id="langBtnEn" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition-all">EN</button>
+    </div>
+  </header>
+
+  <!-- ASOSIY KONTENT KONTEYNERI -->
+  <main class="w-full flex-1 flex flex-col items-center justify-center my-auto">
+
+    <!-- 1-SAHIFA: XUSH KELIBSIZ -->
+    <section id="step1" class="w-full flex flex-col items-center justify-center text-center transition-all duration-500 py-12">
+      <div class="cursor-pointer group select-none p-4 relative" onclick="triggerVortexTransition('step1', 'step2')">
+        
+        <div class="books-orbit-container">
+          <div class="orbiting-book" style="--angle: 0deg; --radius: 190px; animation-delay: 0s;"></div>
+          <div class="orbiting-book" style="--angle: 45deg; --radius: 190px; animation-delay: -1.87s;"></div>
+          <div class="orbiting-book" style="--angle: 90deg; --radius: 190px; animation-delay: -3.75s;"></div>
+          <div class="orbiting-book" style="--angle: 135deg; --radius: 190px; animation-delay: -5.62s;"></div>
+          <div class="orbiting-book" style="--angle: 180deg; --radius: 190px; animation-delay: -7.5s;"></div>
+          <div class="orbiting-book" style="--angle: 225deg; --radius: 190px; animation-delay: -9.37s;"></div>
+          <div class="orbiting-book" style="--angle: 270deg; --radius: 190px; animation-delay: -11.25s;"></div>
+          <div class="orbiting-book" style="--angle: 315deg; --radius: 190px; animation-delay: -13.12s;"></div>
+
+          <h1 class="font-outfit text-5xl sm:text-7xl md:text-8xl font-extrabold tracking-tight text-sky-400 glow-text transition-transform group-hover:scale-105 relative z-10">
+            Xush kelibsiz
+          </h1>
+        </div>
+
+        <p class="text-slate-400 text-sm md:text-base tracking-widest uppercase font-light opacity-80 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 mt-4">
+          <span data-i18n="step1_btn">Platformaga kirish uchun bosing</span>
+          <i class="fa-solid fa-arrow-right text-sky-400 group-hover:translate-x-2 transition-transform"></i>
+        </p>
+      </div>
+    </section>
+
+    <!-- 2-SAHIFA: LOGIN VA PAROL -->
+    <section id="step2" class="hidden w-full max-w-md transition-all duration-500 py-6">
+      <div class="glass-card rounded-3xl p-8 relative overflow-hidden">
+        <button onclick="triggerVortexTransition('step2', 'step1')" class="absolute top-5 left-5 text-xs text-slate-400 hover:text-white bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700/60 flex items-center gap-1 transition-all">
+          <i class="fa-solid fa-arrow-left"></i> <span data-i18n="back">Orqaga</span>
+        </button>
+
+        <div class="text-center mb-6 pt-4">
+          <h2 class="font-outfit text-2xl sm:text-3xl font-bold text-white mb-1" data-i18n="login_title">Tizimga kirish</h2>
+          <p class="text-slate-400 text-xs sm:text-sm" data-i18n="login_desc">Shaxsiy kutubxona va do'stlar chatiga kiring</p>
+        </div>
+
+        <!-- Google orqali kirish -->
+        <button onclick="handleGoogleLogin()" type="button" class="w-full py-3.5 px-4 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 rounded-2xl font-medium text-slate-200 flex items-center justify-center gap-3 transition-all duration-200 mb-5 group shadow-md">
+          <svg class="w-5 h-5 transition-transform group-hover:scale-110" viewBox="0 0 24 24">
+            <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"/>
+            <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
+            <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 10.8 0 12s.7 2.3 1.9 4.7l3.7-2.9z"/>
+            <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.4-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/>
+          </svg>
+          <span class="text-sm font-semibold" data-i18n="google_login">Google orqali tezkor kirish</span>
+        </button>
+
+        <div class="relative flex py-2 items-center mb-5">
+          <div class="flex-grow border-t border-slate-700/60"></div>
+          <span class="flex-shrink mx-4 text-[11px] uppercase tracking-wider text-slate-500" data-i18n="or_email">yoki email orqali</span>
+          <div class="flex-grow border-t border-slate-700/60"></div>
+        </div>
+
+        <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="space-y-4" novalidate>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5" data-i18n="login_email_label">Login / Email</label>
+            <div class="relative">
+              <i class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+              <input type="email" id="loginInput" placeholder="ismingiz@example.com" class="w-full pl-11 pr-4 py-3 bg-slate-900/70 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 transition-all text-sm shadow-inner" required>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5" data-i18n="password_label">Parol</label>
+            <div class="relative">
+              <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+              <input type="password" id="passwordInput" placeholder="••••••••" class="w-full pl-11 pr-11 py-3 bg-slate-900/70 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 transition-all text-sm shadow-inner" required>
+              <button type="button" onclick="togglePasswordVisibility()" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
+                <i id="passwordEyeIcon" class="fa-regular fa-eye text-sm"></i>
+              </button>
+            </div>
+          </div>
+
+          <div id="loginError" class="hidden text-red-400 text-xs font-medium bg-red-500/15 border border-red-500/30 rounded-xl p-3 flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation text-sm shrink-0"></i>
+            <span data-i18n="login_error">Iltimos, login va parol maydonlarini to'liq kiriting!</span>
+          </div>
+
+          <button type="submit" class="w-full py-3.5 px-4 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-semibold rounded-xl shadow-lg shadow-sky-500/25 transition-all duration-200 flex items-center justify-center gap-2 mt-2 text-sm">
+            <span data-i18n="continue">Davom etish</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 2.5-SAHIFA: UNIKAL NIKNEYM YARATISH -->
+    <section id="stepNickname" class="hidden w-full max-w-md transition-all duration-500 py-6">
+      <div class="glass-card rounded-3xl p-8 relative overflow-hidden border border-sky-500/30">
+        <div class="text-center mb-6 pt-2">
+          <div class="w-14 h-14 rounded-2xl bg-sky-500/20 border border-sky-500/40 flex items-center justify-center text-sky-400 text-2xl mx-auto mb-3 shadow-lg">
+            <i class="fa-solid fa-at"></i>
+          </div>
+          <h2 class="font-outfit text-2xl font-bold text-white mb-1" data-i18n="nick_title">Nikneym yarating</h2>
+          <p class="text-slate-400 text-xs sm:text-sm leading-relaxed" data-i18n="nick_desc">Platformadagi yagona taxallusingizni tanlang. U kamida 1 ta harf va 1 ta raqamdan iborat bo'lishi shart.</p>
+        </div>
+
+        <form id="nicknameForm" onsubmit="handleNicknameSubmit(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5" data-i18n="nick_label">Sizning Nikneymingiz</label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sky-400 font-mono font-bold">@</span>
+              <input type="text" id="nicknameInput" oninput="validateNicknameLive()" placeholder="masalan: uzbek99" class="w-full pl-9 pr-11 py-3.5 bg-slate-900/90 border border-slate-700 rounded-2xl text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 transition-all font-mono text-sm shadow-inner" required autocomplete="off">
+              <div id="nicknameStatusIcon" class="absolute right-4 top-1/2 -translate-y-1/2 text-base"></div>
+            </div>
+          </div>
+
+          <!-- Talablar blokeri -->
+          <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-3.5 space-y-2 text-xs">
+            <span class="text-slate-400 font-semibold block uppercase tracking-wider text-[10px]" data-i18n="req_title">Talablar:</span>
+            <div id="reqAlphaNum" class="flex items-center gap-2 text-slate-400">
+              <i class="fa-regular fa-circle text-slate-500"></i> <span data-i18n="req_alphanum">Harf va raqam qatnashgan bo'lishi kerak</span>
+            </div>
+            <div id="reqUnique" class="flex items-center gap-2 text-slate-400">
+              <i class="fa-regular fa-circle text-slate-500"></i> <span data-i18n="req_unique">Boshqa foydalanuvchi band qilmagan bo'lishi kerak</span>
+            </div>
+          </div>
+
+          <div id="nicknameFeedback" class="hidden text-xs font-medium rounded-xl p-3 flex items-center gap-2"></div>
+
+          <button type="submit" class="w-full py-3.5 px-4 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-sky-500/25 transition-all duration-200 flex items-center justify-center gap-2 text-sm mt-3">
+            <span data-i18n="nick_submit">Nikneymni tasdiqlash</span>
+            <i class="fa-solid fa-check"></i>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 3-SAHIFA: MAQSADNI SORASH -->
+    <section id="step3" class="hidden w-full max-w-lg transition-all duration-500 py-6">
+      <div class="glass-card rounded-3xl p-8 relative overflow-hidden">
+        <button onclick="triggerVortexTransition('step3', 'stepNickname')" class="absolute top-5 left-5 text-xs text-slate-400 hover:text-white bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700/60 flex items-center gap-1 transition-all">
+          <i class="fa-solid fa-arrow-left"></i> <span data-i18n="back">Orqaga</span>
+        </button>
+
+        <div class="text-center mb-6 pt-4">
+          <span class="px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-xs font-semibold mb-3 inline-block" data-i18n="purpose_badge">Qisqa tanishuv</span>
+          <h2 class="font-outfit text-2xl sm:text-3xl font-bold text-white mb-1.5" data-i18n="purpose_title">Nima maqsadda ishlatmoqchisiz?</h2>
+          <p class="text-slate-400 text-xs sm:text-sm" data-i18n="purpose_desc">Tayyor variantlardan birini tanlang yoki o'z maqsadingizni yozing</p>
+        </div>
+
+        <form id="purposeForm" onsubmit="handlePurposeSubmit(event)" class="space-y-4">
+          <div class="grid grid-cols-1 gap-2.5">
+            <div onclick="fillPurpose('Men o\'z hikoya va kitoblarimni yozib, boshqalar bilan ulashmoqchiman.')" class="p-3.5 bg-slate-900/70 border border-slate-700/80 hover:border-sky-500 rounded-2xl cursor-pointer transition-all flex items-start gap-3 group">
+              <span class="text-xl shrink-0 mt-0.5">✍️</span>
+              <div>
+                <h5 class="font-bold text-xs sm:text-sm text-white group-hover:text-sky-400" data-i18n="purpose_opt1_label">Kitob yozish</h5>
+                <p class="text-[11px] text-slate-400" data-i18n="purpose_opt1">Men o'z hikoya va kitoblarimni yozib, boshqalar bilan ulashmoqchiman.</p>
+              </div>
+            </div>
+
+            <div onclick="fillPurpose('Javondagi qiziqarli kitoblarni mutolaa qilish va baholash uchun kirdim.')" class="p-3.5 bg-slate-900/70 border border-slate-700/80 hover:border-indigo-500 rounded-2xl cursor-pointer transition-all flex items-start gap-3 group">
+              <span class="text-xl shrink-0 mt-0.5">📚</span>
+              <div>
+                <h5 class="font-bold text-xs sm:text-sm text-white group-hover:text-indigo-400" data-i18n="purpose_opt2_label">Mutolaa qilish</h5>
+                <p class="text-[11px] text-slate-400" data-i18n="purpose_opt2">Javondagi qiziqarli kitoblarni mutolaa qilish va baholash uchun kirdim.</p>
+              </div>
+            </div>
+
+            <div onclick="fillPurpose('Do\'stlar topish, suhbatlashish va imlo jangida kuch sinashmoqchiman.')" class="p-3.5 bg-slate-900/70 border border-slate-700/80 hover:border-emerald-500 rounded-2xl cursor-pointer transition-all flex items-start gap-3 group">
+              <span class="text-xl shrink-0 mt-0.5">⚔️</span>
+              <div>
+                <h5 class="font-bold text-xs sm:text-sm text-white group-hover:text-emerald-400" data-i18n="purpose_opt3_label">Suhbat va Jang</h5>
+                <p class="text-[11px] text-slate-400" data-i18n="purpose_opt3">Do'stlar topish, suhbatlashish va imlo jangida kuch sinashmoqchiman.</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <textarea id="purposeInput" rows="2.5" placeholder="Yoki o'z maqsadingizni shu yerga yozing..." class="w-full p-3.5 bg-slate-900/90 border border-slate-700 rounded-2xl text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 transition-all text-xs sm:text-sm resize-none shadow-inner" data-i18n-placeholder="purpose_input_placeholder"></textarea>
+          </div>
+
+          <div id="purposeError" class="hidden text-red-400 text-xs font-medium bg-red-500/15 border border-red-500/30 rounded-xl p-3 flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation text-sm shrink-0"></i>
+            <span data-i18n="purpose_error">Iltimos, maqsadingizni yozing yoki yuqoridagi tugmalardan tanlang!</span>
+          </div>
+
+          <button type="submit" class="w-full py-3.5 px-4 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-semibold rounded-xl shadow-lg shadow-sky-500/25 transition-all duration-200 flex items-center justify-center gap-2 text-sm">
+            <span data-i18n="purpose_submit">Platformaga o'tish</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 4-SAHIFA: 3 TA ASOSIY BO'LIM TANLOVI (DASHBOARD) -->
+    <section id="step4" class="hidden w-full max-w-5xl transition-all duration-500 my-6 px-4">
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-300 text-xs font-bold mb-3">
+          <i class="fa-solid fa-circle-user"></i>
+          <span id="dashboardNicknameBadge">@muallif1</span>
+          <span class="text-slate-500">•</span>
+          <span id="dashboardUserGreeting">Xush kelibsiz!</span>
+        </div>
+        <h1 class="font-outfit text-3xl sm:text-5xl font-extrabold text-white mb-2" data-i18n="menu_main_title">Asosiy Menyular</h1>
+        <p class="text-slate-400 text-xs sm:text-sm" data-i18n="menu_main_desc">Ijod qilish, kutubxonani ko'zdan kechirish yoki do'stlar bilan imlo jangi o'tkazish uchun bo'limni tanlang</p>
+        
+        <!-- Statistikalar -->
+        <div class="flex justify-center gap-6 mt-4 text-xs font-medium text-slate-300">
+          <div class="bg-slate-900/80 px-4 py-2 rounded-xl border border-slate-800">
+            <span data-i18n="stat_written">Yozilgan:</span> <span id="statWrittenCount" class="text-sky-400 font-bold">0</span> ta
+          </div>
+          <div class="bg-slate-900/80 px-4 py-2 rounded-xl border border-slate-800">
+            <span data-i18n="stat_shelf">Javonda:</span> <span id="statShelfCount" class="text-indigo-400 font-bold">0</span> ta
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- 1-Karta: Kitob Yozish -->
+        <div onclick="triggerVortexTransition('step4', 'menuWrite')" class="glass-card rounded-3xl p-7 flex flex-col items-center text-center cursor-pointer hover:border-sky-400/70 hover:shadow-2xl hover:shadow-sky-500/20 transition-all duration-300 transform hover:-translate-y-2 group">
+          <div class="w-16 h-16 rounded-2xl bg-sky-500/15 border border-sky-500/35 flex items-center justify-center text-sky-400 text-2xl mb-5 group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-pen-nib"></i>
+          </div>
+          <h3 class="font-outfit text-xl font-bold text-white mb-2" data-i18n="card1_title">Kitob yozish</h3>
+          <p class="text-slate-400 text-xs leading-relaxed mb-6" data-i18n="card1_desc">Yangi hikoya va kitoblar yozing, chiziqli daftarda o'z mualliflik asarlaringizni yarating.</p>
+          <span class="mt-auto text-xs font-semibold text-sky-400 group-hover:underline flex items-center gap-1.5"><span data-i18n="card1_btn">Daftarni ochish</span> <i class="fa-solid fa-chevron-right text-[10px]"></i></span>
+        </div>
+
+        <!-- 2-Karta: Kitoblarni ko'rish -->
+        <div onclick="triggerVortexTransition('step4', 'menuLibrary')" class="glass-card rounded-3xl p-7 flex flex-col items-center text-center cursor-pointer hover:border-indigo-400/70 hover:shadow-2xl hover:shadow-indigo-500/20 transition-all duration-300 transform hover:-translate-y-2 group">
+          <div class="w-16 h-16 rounded-2xl bg-indigo-500/15 border border-indigo-500/35 flex items-center justify-center text-indigo-400 text-2xl mb-5 group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-book-open"></i>
+          </div>
+          <h3 class="font-outfit text-xl font-bold text-white mb-2" data-i18n="card2_title">Kitoblarni ko'rish</h3>
+          <p class="text-slate-400 text-xs leading-relaxed mb-6" data-i18n="card2_desc">Yog'och javondagi kitoblarni mutolaa qiling, 5 yulduzli baho bering va Top 10 reytingni kuzating.</p>
+          <span class="mt-auto text-xs font-semibold text-indigo-400 group-hover:underline flex items-center gap-1.5"><span data-i18n="card2_btn">Javonga o'tish</span> <i class="fa-solid fa-chevron-right text-[10px]"></i></span>
+        </div>
+
+        <!-- 3-Karta: Do'stlar bilan suhbat -->
+        <div onclick="triggerVortexTransition('step4', 'menuChat')" class="glass-card rounded-3xl p-7 flex flex-col items-center text-center cursor-pointer hover:border-emerald-400/70 hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-300 transform hover:-translate-y-2 group">
+          <div class="w-16 h-16 rounded-2xl bg-emerald-500/15 border border-emerald-500/35 flex items-center justify-center text-emerald-400 text-2xl mb-5 group-hover:scale-110 transition-transform">
+            <i class="fa-solid fa-comments"></i>
+          </div>
+          <h3 class="font-outfit text-xl font-bold text-white mb-2" data-i18n="card3_title">Do'stlar bilan suhbat</h3>
+          <p class="text-slate-400 text-xs leading-relaxed mb-6" data-i18n="card3_desc">Mamlakat bayrog'i bo'yicha online do'stlar toping, muloqot qiling va ⚔️ Imlo Jangiga chorlang.</p>
+          <span class="mt-auto text-xs font-semibold text-emerald-400 group-hover:underline flex items-center gap-1.5"><span data-i18n="card3_btn">Chatga kirish</span> <i class="fa-solid fa-chevron-right text-[10px]"></i></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- BO'LIM 1: KITOB YOZISH MENYUSI & DAFTAR -->
+    <section id="menuWrite" class="hidden w-full max-w-4xl transition-all duration-500 my-4 px-4">
+      <div id="writeSubMenu" class="glass-card rounded-3xl p-6 sm:p-8">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-slate-700/60">
+          <div>
+            <h2 class="font-outfit text-2xl font-bold text-sky-400 flex items-center gap-2.5">
+              <i class="fa-solid fa-feather-pointed"></i> <span data-i18n="write_menu_title">Kitob Yozish Bo'limi</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5" data-i18n="write_menu_desc">Shaxsiy qo'lyozmalar va daftarlar ustaxonasi</p>
+          </div>
+          <button onclick="triggerVortexTransition('menuWrite', 'step4')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-medium rounded-xl transition-all flex items-center gap-1.5">
+            <i class="fa-solid fa-house"></i> <span data-i18n="home_btn">Bosh sahifa</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div onclick="openNotebookEditor()" class="glass-card rounded-2xl p-6 flex flex-col items-center justify-center text-center cursor-pointer border border-sky-500/40 bg-sky-950/20 hover:bg-sky-900/30 transition-all hover:scale-105 group">
+            <i class="fa-solid fa-file-pen text-4xl text-sky-400 mb-3 group-hover:rotate-12 transition-transform"></i>
+            <h4 class="font-outfit font-bold text-base text-white" data-i18n="write_new_title">Yangi kitob yozish</h4>
+            <p class="text-xs text-slate-400 mt-1" data-i18n="write_new_desc">Chiziqli daftarni ochish</p>
+          </div>
+
+          <div class="md:col-span-2 bg-slate-900/80 border border-slate-800 rounded-2xl p-5 flex flex-col">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+              <h4 class="font-outfit text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                <span data-i18n="saved_books_title">Siz yozgan kitoblar:</span>
+                <span id="savedCountBadge" class="text-xs bg-sky-500/20 text-sky-400 px-2.5 py-0.5 rounded-full border border-sky-500/30">0 ta</span>
+              </h4>
+              
+              <!-- Qidiruv maydoni (Kitob yozish bo'limi uchun) -->
+              <div class="relative w-full sm:w-56">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" id="writtenBooksSearchInput" oninput="renderSavedBooksList()" placeholder="Kitob nomini qidirish..." class="w-full pl-8 pr-8 py-2 bg-slate-950 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 text-xs focus:outline-none focus:border-sky-500" data-i18n-placeholder="search_written_placeholder">
+                <button onclick="clearWrittenBooksSearch()" id="clearWrittenSearchBtn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            </div>
+
+            <div id="mySavedBooksList" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-56 overflow-y-auto pr-1"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Daftarda Yozish Maydoni -->
+      <div id="notebookEditor" class="hidden glass-card rounded-3xl p-6 sm:p-8 relative">
+        <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
+          <span class="text-xs sm:text-sm text-slate-300 flex items-center gap-2">
+            <i class="fa-solid fa-book-bookmark text-sky-400"></i> <span data-i18n="notebook_area_title">Ijodiy Daftar Maydoni</span>
+          </span>
+          <button onclick="closeNotebookToSubmenu()" class="text-slate-400 hover:text-white text-xs bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700 transition-all flex items-center gap-1">
+            <i class="fa-solid fa-xmark"></i> <span data-i18n="cancel">Bekor qilish</span>
+          </button>
+        </div>
+
+        <div class="rounded-2xl overflow-hidden shadow-2xl border-4 border-amber-900/40 relative">
+          <textarea id="notebookText" oninput="updateNotebookStats()" rows="12" class="w-full notebook-paper font-notebook text-xl sm:text-2xl outline-none resize-y p-6 shadow-inner" placeholder="Kitobingizni shu yerga yozing..." data-i18n-placeholder="notebook_placeholder"></textarea>
+        </div>
+
+        <div class="mt-5 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <span id="notebookWordCounter" class="text-xs text-slate-400 font-mono">0 ta so'z • 0 ta belgi</span>
+          <button onclick="saveBookDraft()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold rounded-xl shadow-lg shadow-orange-500/30 transition-all transform hover:scale-105 flex items-center justify-center gap-2 text-sm">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span data-i18n="save">Saqlash</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- KITOBGA NOM BERISH MODAL -->
+    <div id="titleModal" class="custom-modal">
+      <div class="glass-card rounded-3xl p-6 sm:p-8 max-w-md w-full border border-orange-500/40 relative shadow-2xl">
+        <h3 class="font-outfit text-2xl font-bold text-white mb-1" data-i18n="modal_title_heading">Kitobga nom bering</h3>
+        <p class="text-slate-400 text-xs sm:text-sm mb-5" data-i18n="modal_title_desc">Yozgan asaringiz uchun chiroyli sarlavha kiriting:</p>
+
+        <input type="text" id="bookTitleInput" placeholder="Masalan: Yulduzli Tunlar" class="w-full p-3.5 bg-slate-900/90 border border-slate-700 rounded-2xl text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 mb-6 text-sm shadow-inner" data-i18n-placeholder="modal_title_placeholder">
+
+        <div class="flex justify-end gap-3">
+          <button onclick="confirmSaveBookTitle()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold rounded-xl hover:from-amber-400 hover:to-orange-500 shadow-lg text-sm" data-i18n="save_and_finish">
+            Saqlash va Yakunlash
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BO'LIM 2: KITOBLARNI KO'RISH (MINECRAFT JAVONI) -->
+    <section id="menuLibrary" class="hidden w-full max-w-5xl transition-all duration-500 my-4 px-4">
+      <div class="glass-card rounded-3xl p-6 sm:p-8">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-slate-700/60">
+          <div>
+            <h2 class="font-outfit text-2xl font-bold text-indigo-400 flex items-center gap-2.5">
+              <i class="fa-solid fa-book-shelf"></i> <span data-i18n="shelf_menu_title">Kitoblar Javoni</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5" data-i18n="shelf_menu_desc">Kitob nomi yoki muallif nikneymi (@nik) bo'yicha qidiring va o'qing</p>
+          </div>
+          <button onclick="triggerVortexTransition('menuLibrary', 'step4')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-medium rounded-xl transition-all flex items-center gap-1.5">
+            <i class="fa-solid fa-house"></i> <span data-i18n="home_btn">Bosh sahifa</span>
+          </button>
+        </div>
+
+        <!-- JAVON QIDIRUV PANELI -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 mb-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="relative w-full sm:max-w-md">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+            <input type="text" id="shelfSearchInput" oninput="renderShelfGrid()" placeholder="Kitob nomi yoki muallif nikneymi (@nik) kiriting..." class="w-full pl-10 pr-9 py-2.5 bg-slate-950 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 text-xs sm:text-sm focus:outline-none focus:border-indigo-500" data-i18n-placeholder="shelf_search_placeholder">
+            <button onclick="clearShelfSearch()" id="clearShelfSearchBtn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <span id="shelfSearchMeta" class="text-xs text-slate-400 font-mono" data-i18n="shelf_all_books">Barcha kitoblar ko'rsatilmoqda</span>
+        </div>
+
+        <div class="mc-bookshelf rounded-2xl p-4 mb-6">
+          <div class="flex justify-between items-center mb-3 px-1">
+            <span class="font-outfit text-xs text-amber-200/70 uppercase tracking-widest" data-i18n="shelf_grid_label">Omni Shelf Grid • 3D Kutubxona</span>
+            <span id="shelfTotalBadge" class="text-xs font-mono text-amber-300 font-bold bg-black/40 px-2 py-0.5 rounded">0 ta kitob</span>
+          </div>
+          <div id="shelfGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 min-h-[220px]"></div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900/80 p-4 rounded-2xl border border-slate-800">
+          <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+            <button onclick="openPublishModal()" class="w-full sm:w-auto px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20 transition-all">
+              <i class="fa-solid fa-plus-circle"></i> <span data-i18n="publish_btn">Kitob qo'yish</span>
+            </button>
+            <button onclick="togglePublishedView()" class="w-full sm:w-auto px-5 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 transition-all">
+              <i class="fa-solid fa-layer-group text-sky-400"></i> <span data-i18n="published_btn">Qo'yilganlar</span>
+            </button>
+            <button onclick="toggleTopBooksView()" class="w-full sm:w-auto px-5 py-3 bg-amber-600/80 hover:bg-amber-500 text-white font-semibold rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-600/20 transition-all">
+              <i class="fa-solid fa-trophy text-amber-300"></i> <span data-i18n="top_books_btn">Top kitoblar</span>
+            </button>
+          </div>
+          <span class="text-[11px] text-slate-400 text-center sm:text-right" data-i18n="shelf_footer_tip">Kitoblarni o'qish va baholash uchun muqovasiga bosing</span>
+        </div>
+
+        <!-- Qo'yilgan kitoblar paneli -->
+        <div id="publishedBooksPanel" class="hidden mt-6 bg-slate-950/90 border border-slate-800 rounded-2xl p-5">
+          <h4 class="font-outfit text-sm font-bold text-white mb-4 flex items-center justify-between">
+            <span data-i18n="my_published_title">Qo'yilgan Kitoblaringiz Ro'yxati:</span>
+            <span class="text-[11px] text-red-400 font-normal" data-i18n="my_published_hint">Qizil tugma orqali o'chirish mumkin</span>
+          </h4>
+          <div id="publishedList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
+        </div>
+
+        <!-- Top 10 Kitoblar Paneli -->
+        <div id="topBooksPanel" class="hidden mt-6 bg-amber-950/25 border border-amber-500/30 rounded-2xl p-5">
+          <h4 class="font-outfit text-sm font-bold text-amber-300 mb-4 flex items-center justify-between">
+            <span class="flex items-center gap-2"><i class="fa-solid fa-star text-amber-400"></i> <span data-i18n="top10_heading">Eng yuqori baholangan Top 10 Kitoblar:</span></span>
+            <span class="text-[11px] text-slate-400" data-i18n="top10_sub">Yulduzlar bo'yicha reyting</span>
+          </h4>
+          <div id="topBooksList" class="space-y-2.5"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- KITOBNI JAVONGA QO'YISH MODALI -->
+    <div id="publishModal" class="custom-modal">
+      <div class="glass-card rounded-3xl p-6 sm:p-8 max-w-lg w-full border border-indigo-500/40 relative shadow-2xl flex flex-col max-h-[90vh]">
+        <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
+          <h3 class="font-outfit text-xl font-bold text-white" data-i18n="publish_modal_title">Javonga kitob qo'yish</h3>
+          <button onclick="closePublishModal()" class="text-slate-400 hover:text-white text-sm"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <p class="text-xs text-slate-400 mb-4" data-i18n="publish_modal_desc">O'zingiz yozgan kitoblardan birini tanlab umumiy javonga joylashtiring:</p>
+
+        <div id="publishBookSelectArea" class="space-y-2.5 overflow-y-auto flex-1 mb-4 pr-1"></div>
+
+        <div id="confirmWarningText" class="hidden text-emerald-400 text-xs bg-emerald-500/10 border border-emerald-500/25 rounded-xl p-3 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-circle-check text-base shrink-0"></i>
+          <span data-i18n="publish_selected_note">Kitob tanlandi! Uni javonga joylashtirishga tayyormisiz?</span>
+        </div>
+
+        <button onclick="handlePublishAction()" id="publishActionBtn" class="w-full py-3.5 bg-slate-800 text-slate-300 font-bold rounded-xl transition-all flex items-center justify-center gap-2 text-sm shadow">
+          <span id="publishActionBtnText" data-i18n="no_book_selected">Kitob tanlanmadi (Yopish)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- KITOB O'QISH MODALI BILAN 5 YULDUZLI BAHOLASH -->
+    <div id="readBookModal" class="custom-modal p-4">
+      <div class="glass-card rounded-3xl p-6 sm:p-8 max-w-2xl w-full border border-sky-500/40 relative max-h-[92vh] flex flex-col shadow-2xl">
+        <div class="flex justify-between items-center pb-4 mb-3 border-b border-slate-700/80">
+          <div class="flex items-center gap-3 truncate">
+            <div class="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold shrink-0">
+              <i class="fa-solid fa-book-open"></i>
+            </div>
+            <div class="truncate">
+              <h3 id="readBookModalTitle" class="font-outfit text-xl sm:text-2xl font-bold text-white truncate">Kitob Sarlavhasi</h3>
+              <p id="readBookModalDate" class="text-[11px] text-slate-400 truncate">Muallif & Sana</p>
+            </div>
+          </div>
+          <button onclick="closeReadBookModal()" class="w-9 h-9 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl flex items-center justify-center transition-all shrink-0">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+
+        <!-- 5 YULDUZLI BAHOLASH BLOKI -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 mb-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-inner">
+          <div class="text-xs text-slate-300 font-medium flex items-center gap-2">
+            <span data-i18n="rate_prompt">Ushbu kitobga baho bering:</span>
+            <span id="bookRatingBadge" class="text-amber-400 font-bold font-mono bg-amber-500/10 px-2.5 py-0.5 rounded border border-amber-500/20">0.0 (0 ta baho)</span>
+          </div>
+          <div class="flex items-center gap-1.5 text-2xl cursor-pointer" id="starRatingGroup">
+            <i onclick="rateCurrentBook(1)" class="star-btn fa-regular fa-star text-slate-600 hover:text-amber-400 transition-colors"></i>
+            <i onclick="rateCurrentBook(2)" class="star-btn fa-regular fa-star text-slate-600 hover:text-amber-400 transition-colors"></i>
+            <i onclick="rateCurrentBook(3)" class="star-btn fa-regular fa-star text-slate-600 hover:text-amber-400 transition-colors"></i>
+            <i onclick="rateCurrentBook(4)" class="star-btn fa-regular fa-star text-slate-600 hover:text-amber-400 transition-colors"></i>
+            <i onclick="rateCurrentBook(5)" class="star-btn fa-regular fa-star text-slate-600 hover:text-amber-400 transition-colors"></i>
+          </div>
+        </div>
+
+        <div class="overflow-y-auto flex-1 rounded-2xl border-4 border-amber-900/40">
+          <div id="readBookModalContent" class="notebook-paper font-notebook text-xl sm:text-2xl p-6 min-h-[280px]"></div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-800 flex justify-end">
+          <button onclick="closeReadBookModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs rounded-xl flex items-center gap-1.5 transition-all">
+            <i class="fa-solid fa-arrow-left"></i> <span data-i18n="back_to_shelf">Javonga qaytish</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BO'LIM 3: DO'STLAR BILAN SUHBAT (BAYROQ, QIDIRUV VA BOT) -->
+    <section id="menuChat" class="hidden w-full max-w-4xl transition-all duration-500 my-4 px-4">
+      <div class="glass-card rounded-3xl p-6 sm:p-8">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-slate-700/60">
+          <div class="flex items-center gap-3 flex-wrap">
+            <h2 class="font-outfit text-2xl font-bold text-emerald-400 flex items-center gap-2.5">
+              <i class="fa-solid fa-comments"></i> <span data-i18n="chat_menu_title">Do'stlar bilan suhbat</span>
+            </h2>
+            <div class="flex items-center gap-1.5">
+              <span id="userFlagBadge" class="hidden px-3 py-1 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs rounded-full font-bold flex items-center gap-1.5 shadow"></span>
+              <button onclick="changeUserFlag()" class="text-[11px] text-slate-400 hover:text-white underline bg-slate-800/80 px-2.5 py-1 rounded-lg">O'zgartirish</button>
+            </div>
+          </div>
+          <button onclick="triggerVortexTransition('menuChat', 'step4')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-medium rounded-xl transition-all flex items-center gap-1.5">
+            <i class="fa-solid fa-house"></i> <span data-i18n="home_btn">Bosh sahifa</span>
+          </button>
+        </div>
+
+        <!-- BAYROQ TANLASH -->
+        <div id="flagSelectionBox" class="bg-slate-900/95 border border-emerald-500/35 rounded-3xl p-6 sm:p-8 text-center max-w-md mx-auto my-6 shadow-xl">
+          <div class="w-16 h-16 bg-emerald-500/15 rounded-2xl flex items-center justify-center text-emerald-400 text-2xl mx-auto mb-4 border border-emerald-500/30">
+            <i class="fa-solid fa-globe"></i>
+          </div>
+          <h3 class="font-outfit text-xl font-bold text-white mb-2" data-i18n="flag_modal_title">Mamlakat bayrog'ingizni tanlang</h3>
+          <p class="text-xs text-slate-400 mb-6 leading-relaxed" data-i18n="flag_modal_desc">Shu bayroq orqali bir xil mamlakatdagi online do'stlaringiz bilan bog'lanasiz</p>
+
+          <div class="flex justify-center gap-3 text-3xl mb-5">
+            <span onclick="setFlag('🇺🇿 Uzbekistan')" class="cursor-pointer hover:scale-125 transition-transform p-1">🇺🇿</span>
+            <span onclick="setFlag('🇹🇷 Turkey')" class="cursor-pointer hover:scale-125 transition-transform p-1">🇹🇷</span>
+            <span onclick="setFlag('🇺🇸 USA')" class="cursor-pointer hover:scale-125 transition-transform p-1">🇺🇸</span>
+            <span onclick="setFlag('🇬🇧 UK')" class="cursor-pointer hover:scale-125 transition-transform p-1">🇬🇧</span>
+            <span onclick="setFlag('🇰🇷 Korea')" class="cursor-pointer hover:scale-125 transition-transform p-1">🇰🇷</span>
+            <span onclick="setFlag('🇰🇿 Kazakhstan')" class="cursor-pointer hover:scale-125 transition-transform p-1">🇰🇿</span>
+          </div>
+
+          <div class="flex gap-2">
+            <input type="text" id="flagInput" placeholder="Masalan: 🇺🇿 Uzbekistan" class="w-full p-3.5 bg-slate-800 border border-slate-700 rounded-2xl text-white text-xs sm:text-sm focus:outline-none focus:border-emerald-500 shadow-inner" data-i18n-placeholder="flag_input_placeholder">
+            <button onclick="confirmUserFlag()" class="px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl text-xs sm:text-sm transition-all shadow-lg shrink-0" data-i18n="confirm">
+              Tasdiqlash
+            </button>
+          </div>
+        </div>
+
+        <!-- CHAT INTERFEYSI -->
+        <div id="chatMainBox" class="hidden">
+          <div class="flex border-b border-slate-800 mb-4 overflow-x-auto">
+            <button id="tabOnlineBtn" onclick="switchChatTab('online')" class="py-3 px-5 text-xs sm:text-sm font-bold border-b-2 border-emerald-500 text-emerald-400 flex items-center gap-2 whitespace-nowrap">
+              <i class="fa-solid fa-wifi text-xs"></i> <span data-i18n="tab_online">Online Do'stlar</span> (<span id="onlineCountBadge">0</span>)
+            </button>
+            <button id="tabCloseFriendsBtn" onclick="switchChatTab('close')" class="py-3 px-5 text-xs sm:text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2 whitespace-nowrap">
+              <i class="fa-solid fa-star text-amber-400 text-xs"></i> <span data-i18n="tab_close">Yaqin Do'stlar</span> (<span id="closeFriendsCountBadge">0</span>)
+            </button>
+            <button id="tabBattleBtn" onclick="switchChatTab('battle')" class="py-3 px-5 text-xs sm:text-sm font-bold border-b-2 border-transparent text-red-400 hover:text-red-300 flex items-center gap-2 whitespace-nowrap bg-red-500/10 rounded-t-xl">
+              <i class="fa-solid fa-swords text-xs"></i> <span data-i18n="tab_battle">⚔️ Jang</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 h-[470px]">
+            <!-- Chap tomondagi Do'stlar Ro'yxati va Qidiruv / Bot -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-col h-full overflow-hidden shadow-inner">
+              
+              <!-- Do'stlar qidiruvi (Nik, Gmail yoki Ism bo'yicha) -->
+              <div class="relative mb-2.5">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" id="friendSearchInput" oninput="renderFriendsList()" placeholder="Nik, Gmail yoki ism kiriting..." class="w-full pl-8 pr-8 py-2 bg-slate-950 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 text-xs focus:outline-none focus:border-emerald-500" data-i18n-placeholder="search_friend_placeholder">
+                <button onclick="clearFriendSearch()" id="clearFriendSearchBtn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+
+              <span id="friendsListTitle" class="text-[11px] uppercase tracking-wider font-semibold text-slate-400 px-1 py-1 mb-1.5" data-i18n="friends_list_default">
+                Bayrog'ingizdagi online foydalanuvchilar:
+              </span>
+
+              <div id="friendsListContainer" class="space-y-2 overflow-y-auto flex-1 pr-1"></div>
+
+              <!-- 🤖 MASHQ BOTI (Kichik qism) -->
+              <div class="mt-2.5 pt-2.5 border-t border-slate-800 bg-slate-950/70 p-2.5 rounded-xl flex items-center justify-between">
+                <div class="flex items-center gap-2.5 truncate">
+                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 text-white flex items-center justify-center text-xs font-bold shrink-0">🤖</div>
+                  <div class="truncate">
+                    <h5 class="font-outfit font-bold text-xs text-amber-300 truncate" data-i18n="bot_title">Mashq Boti</h5>
+                    <span class="text-[10px] text-slate-400 block truncate" data-i18n="bot_subtitle">Yozish tezligini oshiring</span>
+                  </div>
+                </div>
+                <button onclick="startBotPracticeBattle()" class="px-3 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-[11px] rounded-lg shadow transition-all shrink-0 flex items-center gap-1">
+                  <span data-i18n="practice_btn">⚔️ Mashq</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- O'ng tomondagi Jonli Suhbat Oynasi -->
+            <div class="md:col-span-2 bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col h-full shadow-inner">
+              <div id="activeChatHeader" class="flex justify-between items-center pb-3 border-b border-slate-800">
+                <div class="flex items-center gap-3 truncate">
+                  <div id="chatUserAvatar" class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-sm font-bold text-white shrink-0">?</div>
+                  <div class="truncate">
+                    <h4 id="chatUserName" class="font-outfit font-bold text-sm text-white truncate" data-i18n="select_chat_partner">Suhbatdoshni tanlang</h4>
+                    <span id="chatUserStatus" class="text-[11px] text-slate-400 truncate block">---</span>
+                  </div>
+                </div>
+
+                <button id="subCloseFriendBtn" onclick="toggleSubscribeActiveUser()" class="hidden px-3.5 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 shrink-0">
+                  <i class="fa-regular fa-star"></i>
+                  <span id="subBtnText" data-i18n="save_close_friend">Yaqin do'st deb saqlash</span>
+                </button>
+              </div>
+
+              <!-- Xabarlar maydoni -->
+              <div id="chatMessagesArea" class="flex-1 overflow-y-auto py-4 space-y-3 pr-1 text-sm">
+                <div class="text-center text-xs text-slate-500 my-auto py-10" data-i18n="chat_empty_prompt">Muloqotni boshlash uchun chap tarafdan do'stingizni tanlang</div>
+              </div>
+
+              <!-- Xabar yuborish inputi -->
+              <form id="chatSendForm" onsubmit="sendChatMessage(event)" class="pt-3 border-t border-slate-800 flex gap-2">
+                <input type="text" id="chatInput" placeholder="Xabaringizni yozing..." class="flex-1 p-3 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs sm:text-sm focus:outline-none focus:border-emerald-500 shadow-inner" data-i18n-placeholder="chat_input_placeholder" disabled>
+                <button type="submit" id="chatSendBtn" class="px-5 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs sm:text-sm transition-all disabled:opacity-50 disabled:pointer-events-none shadow">
+                  <i class="fa-solid fa-paper-plane"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GOOGLE OAUTH MODAL -->
+    <div id="googleModal" class="custom-modal">
+      <div class="glass-card border border-slate-700 rounded-3xl w-full max-w-sm p-6 shadow-2xl">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+          <span class="font-bold text-slate-100 text-sm" data-i18n="google_modal_title">Google hisobini tanlang</span>
+          <button onclick="closeGoogleModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-base"></i></button>
+        </div>
+        <div class="space-y-2.5">
+          <button onclick="confirmGoogleAuth('Ali Valiyev', 'ali.valiyev@gmail.com')" class="w-full p-3.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 rounded-2xl flex items-center gap-3 text-left transition-all">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-sky-600 to-blue-700 text-white flex items-center justify-center font-bold text-sm shrink-0">A</div>
+            <div class="truncate">
+              <div class="text-xs sm:text-sm font-bold text-white truncate">Ali Valiyev</div>
+              <div class="text-[11px] text-slate-400 truncate">ali.valiyev@gmail.com</div>
+            </div>
+          </button>
+          <button onclick="confirmGoogleAuth('Zaynab Karimova', 'zaynab.k@gmail.com')" class="w-full p-3.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 rounded-2xl flex items-center gap-3 text-left transition-all">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-pink-700 text-white flex items-center justify-center font-bold text-sm shrink-0">Z</div>
+            <div class="truncate">
+              <div class="text-xs sm:text-sm font-bold text-white truncate">Zaynab Karimova</div>
+              <div class="text-[11px] text-slate-400 truncate">zaynab.k@gmail.com</div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- JANGGA CHAQIRUV BILDIRISHNOMASI (TOAST) -->
+    <div id="battleChallengeToast" class="fixed bottom-6 right-6 glass-card border-2 border-red-500/80 shadow-2xl rounded-3xl p-5 max-w-sm w-full z-50 transform translate-y-24 opacity-0 pointer-events-none transition-all duration-300">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-11 h-11 rounded-2xl bg-red-500/20 text-red-400 flex items-center justify-center text-xl font-bold shrink-0 border border-red-500/40">⚔️</div>
+        <div class="truncate">
+          <h4 id="challengeSenderName" class="font-outfit font-bold text-sm text-white truncate">Sardor sizni jangga chaqirdi!</h4>
+          <p class="text-[11px] text-slate-400" data-i18n="challenge_toast_sub">10 soniya ichida javob bering</p>
+        </div>
+      </div>
+      
+      <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden mb-4 border border-slate-800">
+        <div id="challengeTimerBar" class="bg-gradient-to-r from-red-500 to-orange-500 h-full w-full transition-all linear"></div>
+      </div>
+
+      <div class="flex gap-2.5">
+        <button onclick="respondChallenge(true)" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-600/20">
+          <i class="fa-solid fa-check"></i> <span data-i18n="accept">Ha (Qabul)</span>
+        </button>
+        <button onclick="respondChallenge(false)" class="flex-1 py-2.5 bg-red-600/90 hover:bg-red-500 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-red-600/20">
+          <i class="fa-solid fa-xmark"></i> <span data-i18n="decline">Yo'q (Rad etish)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- JANG ARENASI MODALI (JONLI IMLO VA TEZ YOZUV) -->
+    <div id="battleArenaModal" class="custom-modal p-4">
+      <div class="glass-card rounded-3xl p-6 sm:p-8 max-w-3xl w-full border border-red-500/40 relative flex flex-col max-h-[96vh] shadow-2xl">
+        
+        <!-- Tepada Chiqish Tugmasi -->
+        <div class="flex justify-between items-center pb-4 mb-4 border-b border-slate-800">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">⚔️</span>
+            <div>
+              <h3 class="font-outfit text-lg sm:text-xl font-bold text-red-400" data-i18n="battle_modal_title">Imlo va Tez Yozuv Jangi</h3>
+              <p id="battleOpponentInfo" class="text-xs text-slate-400">Raqib: Sardor Umarov</p>
+            </div>
+          </div>
+          
+          <button onclick="quitBattleArena(true)" class="px-4 py-2 bg-red-600/20 hover:bg-red-600 border border-red-500/40 text-red-300 hover:text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5">
+            <i class="fa-solid fa-door-open"></i> <span data-i18n="quit">Chiqish</span>
+          </button>
+        </div>
+
+        <!-- Namuna Mavzu va Sher/Matn -->
+        <div class="bg-slate-900/95 border border-slate-800 rounded-2xl p-4 mb-4 shadow-inner">
+          <div class="flex justify-between items-center mb-1.5">
+            <span class="text-[11px] uppercase font-bold text-amber-400 tracking-wider" data-i18n="sample_text_label">Namuna Matn (Jonli Tekshiruv):</span>
+            <span id="liveAccuracyBadge" class="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Aniqlik: 100%</span>
+          </div>
+          <p id="sampleBattleText" class="font-notebook text-lg sm:text-xl text-amber-100 leading-relaxed select-none min-h-[50px]">
+            "Vatan - bu inson kamol topadigan, o'z baxtini va kelajagini quradigan eng muqaddas maskandir."
+          </p>
+        </div>
+
+        <!-- Yozish Maydoni -->
+        <div class="mb-4">
+          <div class="flex justify-between items-center mb-2">
+            <label class="text-xs text-slate-300 font-medium" data-i18n="battle_input_label">Yuqoridagi matnni aniq va xatosiz ko'chiring:</label>
+            <div class="flex items-center gap-2 bg-red-950/70 border border-red-500/40 px-3 py-1 rounded-xl">
+              <i class="fa-solid fa-stopwatch text-red-400 animate-pulse text-xs"></i>
+              <span id="battle5MinTimer" class="font-mono text-sm font-bold text-red-300">05:00</span>
+            </div>
+          </div>
+          <textarea id="battleInputText" oninput="checkBattleTyping()" rows="3.5" placeholder="Matnni shu yerga yozishni boshlang..." class="w-full p-4 bg-slate-950 border border-slate-700 rounded-2xl text-white font-notebook text-lg focus:outline-none focus:border-red-500 transition-all resize-none shadow-inner" data-i18n-placeholder="battle_input_placeholder"></textarea>
+        </div>
+
+        <!-- Natijalar va Ballar -->
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div class="bg-slate-900/90 p-3.5 rounded-2xl border border-slate-800 text-center">
+            <span class="text-[11px] text-slate-400 block mb-0.5" data-i18n="my_score">Sizning Ballingiz</span>
+            <span id="myBattleScore" class="text-xl sm:text-2xl font-bold font-mono text-emerald-400">100 / 100</span>
+          </div>
+          <div class="bg-slate-900/90 p-3.5 rounded-2xl border border-slate-800 text-center">
+            <span class="text-[11px] text-slate-400 block mb-0.5" data-i18n="opp_score">Raqib Balli</span>
+            <span id="oppBattleScore" class="text-xl sm:text-2xl font-bold font-mono text-amber-400">---</span>
+          </div>
+        </div>
+
+        <button onclick="finishBattleMatch()" class="w-full py-3.5 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
+          <i class="fa-solid fa-flag-checkered"></i> <span data-i18n="submit_result">Natijani topshirish (Jangni yakunlash)</span>
+        </button>
+
+        <!-- Jang Yakuniy Mukofot va Xatolar Tahlili Overlay -->
+        <div id="battleResultModal" class="absolute inset-0 bg-slate-950/98 backdrop-blur-xl rounded-3xl p-6 flex flex-col items-center justify-center text-center opacity-0 pointer-events-none transition-opacity duration-300 z-30 overflow-y-auto">
+          <div id="resultIcon" class="text-5xl mb-2">🏆</div>
+          <h2 id="resultTitle" class="font-outfit text-2xl sm:text-3xl font-extrabold text-amber-300 mb-1">Sizdan zo'ri yo'q!</h2>
+          <p id="resultDesc" class="text-xs sm:text-sm text-slate-300 mb-4">Ajoyib natija!</p>
+          
+          <div class="w-full bg-slate-900/90 border border-slate-800 rounded-2xl p-4 mb-5 text-left">
+            <h4 class="font-outfit text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <i class="fa-solid fa-bug text-red-400"></i> <span data-i18n="error_analysis">Xatolar va Imlo Tahlili:</span>
+            </h4>
+            <div id="battleErrorDetails" class="text-xs space-y-2 max-h-36 overflow-y-auto pr-1"></div>
+          </div>
+
+          <button onclick="closeBattleResultModal()" class="px-7 py-3 bg-red-600 hover:bg-red-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all" data-i18n="finish_battle">
+            Jangni Yakunlash
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="w-full max-w-6xl py-4 mt-auto text-center text-xs text-slate-500 border-t border-slate-800/80">
+    <span>© 2026 Omniverse • Interactive Books & Social Platform. Barcha huquqlar himoyalangan.</span>
+  </footer>
+
+  <script>
+    // --- GLOBAL STATE & PERSISTENCE ---
+    let myBooks = JSON.parse(localStorage.getItem('my_written_books') || '[]');
+    let publishedBooks = JSON.parse(localStorage.getItem('my_published_books') || '[]');
+    let bookRatings = JSON.parse(localStorage.getItem('book_ratings') || '{}');
+    let userFlag = localStorage.getItem('user_flag') || '';
+    let closeFriendsIds = JSON.parse(localStorage.getItem('close_friends_ids') || '[]');
+    let chatHistories = JSON.parse(localStorage.getItem('chat_histories') || '{}');
+    
+    let takenNicknames = JSON.parse(localStorage.getItem('taken_nicknames') || '["alisher2026", "madina99", "sardor01"]');
+    let userNickname = localStorage.getItem('user_nickname') || '';
+    let currentUserName = localStorage.getItem('current_user_name') || 'Muallif';
+    let userEmail = localStorage.getItem('user_email') || 'muallif@example.com';
+
+    let currentDraftText = "";
+    let selectedBookToPublishId = null;
+    let activeReadingBookId = null;
+    let activeChatTab = 'online';
+    let selectedChatUser = null;
+
+    // Jang o'zgaruvchilari
+    let battleOpponent = null;
+    let battleTimerInterval = null;
+    let battleTimeRemaining = 10;
+    let battle5MinInterval = null;
+    let battle5MinTimeRemaining = 300;
+    let isBotPracticeMode = false;
+    let battleSampleText = "";
+
+    const battleSampleTexts = [
+      "Vatan - bu inson kamol topadigan, o'z baxtini va kelajagini quradigan eng muqaddas maskandir.",
+      "Kitob - bilim bulog'i, uning sahifalarida olamlarning sir-sinoatlari yashiringan.",
+      "Ilm olish va o'qish insonni yuksaltiruvchi eng ulug' fazilatlardan biri hisoblanadi."
+    ];
+
+    const bookThemes = [
+      "from-amber-700 to-amber-950 border-amber-500/80",
+      "from-emerald-700 to-emerald-950 border-emerald-500/80",
+      "from-indigo-700 to-indigo-950 border-indigo-500/80",
+      "from-rose-700 to-rose-950 border-rose-500/80",
+      "from-purple-700 to-purple-950 border-purple-500/80",
+      "from-cyan-700 to-cyan-950 border-cyan-500/80"
+    ];
+
+    // Mock Online va Offline Foydalanuvchilar Bazasi
+    const mockUsers = [
+      { id: 101, name: "Jasur Bek", nickname: "jasur2026", email: "jasur.bek@gmail.com", flag: "🇺🇿 Uzbekistan", isOnline: true, avatar: "J" },
+      { id: 102, name: "Madina Malikova", nickname: "madina01", email: "madina.m@gmail.com", flag: "🇺🇿 Uzbekistan", isOnline: true, avatar: "M" },
+      { id: 103, name: "Sardor Umarov", nickname: "sardor77", email: "sardor.u@gmail.com", flag: "🇺🇿 Uzbekistan", isOnline: false, avatar: "S" },
+      { id: 104, name: "Emre Yilmaz", nickname: "emre34", email: "emre.y@gmail.com", flag: "🇹🇷 Turkey", isOnline: true, avatar: "E" },
+      { id: 105, name: "John Smith", nickname: "johnsmith99", email: "john.smith@gmail.com", flag: "🇺🇸 USA", isOnline: true, avatar: "J" },
+      { id: 106, name: "Elena Kim", nickname: "elena77", email: "elena.kim@gmail.com", flag: "🇰🇷 Korea", isOnline: true, avatar: "K" },
+      { id: 107, name: "Azamat Nurov", nickname: "azamat05", email: "azamat.n@gmail.com", flag: "🇺🇿 Uzbekistan", isOnline: false, avatar: "A" }
+    ];
+
+    // --- MULTI-LANGUAGE DICTIONARY (UZ, RU, EN) ---
+    let currentLang = localStorage.getItem('omni_lang') || 'uz';
+
+    const i18nData = {
+      uz: {
+        step1_btn: "Platformaga kirish uchun bosing",
+        back: "Orqaga",
+        login_title: "Tizimga kirish",
+        login_desc: "Shaxsiy kutubxona va do'stlar chatiga kiring",
+        google_login: "Google orqali tezkor kirish",
+        or_email: "yoki email orqali",
+        login_email_label: "Login / Email",
+        password_label: "Parol",
+        login_error: "Iltimos, login va parol maydonlarini to'liq kiriting!",
+        continue: "Davom etish",
+        nick_title: "Nikneym yarating",
+        nick_desc: "Platformadagi yagona taxallusingizni tanlang. U kamida 1 ta harf va 1 ta raqamdan iborat bo'lishi shart.",
+        nick_label: "Sizning Nikneymingiz",
+        req_title: "Talablar:",
+        req_alphanum: "Harf va raqam qatnashgan bo'lishi kerak",
+        req_unique: "Boshqa foydalanuvchi band qilmagan bo'lishi kerak",
+        nick_submit: "Nikneymni tasdiqlash",
+        purpose_badge: "Qisqa tanishuv",
+        purpose_title: "Nima maqsadda ishlatmoqchisiz?",
+        purpose_desc: "Tayyor variantlardan birini tanlang yoki o'z maqsadingizni yozing",
+        purpose_opt1_label: "Kitob yozish",
+        purpose_opt1: "Men o'z hikoya va kitoblarimni yozib, boshqalar bilan ulashmoqchiman.",
+        purpose_opt2_label: "Mutolaa qilish",
+        purpose_opt2: "Javondagi qiziqarli kitoblarni mutolaa qilish va baholash uchun kirdim.",
+        purpose_opt3_label: "Suhbat va Jang",
+        purpose_opt3: "Do'stlar topish, suhbatlashish va imlo jangida kuch sinashmoqchiman.",
+        purpose_error: "Iltimos, maqsadingizni yozing yoki yuqoridagi tugmalardan tanlang!",
+        purpose_input_placeholder: "Yoki o'z maqsadingizni shu yerga yozing...",
+        purpose_submit: "Platformaga o'tish",
+        stat_written: "Yozilgan:",
+        stat_shelf: "Javonda:",
+        menu_main_title: "Asosiy Menyular",
+        menu_main_desc: "Ijod qilish, kutubxonani ko'zdan kechirish yoki do'stlar bilan imlo jangi o'tkazish uchun bo'limni tanlang",
+        card1_title: "Kitob yozish",
+        card1_desc: "Yangi hikoya va kitoblar yozing, chiziqli daftarda o'z mualliflik asarlaringizni yarating.",
+        card1_btn: "Daftarni ochish",
+        card2_title: "Kitoblarni ko'rish",
+        card2_desc: "Yog'och javondagi kitoblarni mutolaa qiling, 5 yulduzli baho bering va Top 10 reytingni kuzating.",
+        card2_btn: "Javonga o'tish",
+        card3_title: "Do'stlar bilan suhbat",
+        card3_desc: "Mamlakat bayrog'i bo'yicha online do'stlar toping, muloqot qiling va ⚔️ Imlo Jangiga chorlang.",
+        card3_btn: "Chatga kirish",
+        write_menu_title: "Kitob Yozish Bo'limi",
+        write_menu_desc: "Shaxsiy qo'lyozmalar va daftarlar ustaxonasi",
+        home_btn: "Bosh sahifa",
+        write_new_title: "Yangi kitob yozish",
+        write_new_desc: "Chiziqli daftarni ochish",
+        saved_books_title: "Siz yozgan kitoblar:",
+        search_written_placeholder: "Kitob nomini qidirish...",
+        notebook_area_title: "Ijodiy Daftar Maydoni",
+        cancel: "Bekor qilish",
+        notebook_placeholder: "Kitobingiz yoki hikoyangizni shu yerga yozing...",
+        save: "Saqlash",
+        modal_title_heading: "Kitobga nom bering",
+        modal_title_desc: "Yozgan asaringiz uchun chiroyli sarlavha kiriting:",
+        modal_title_placeholder: "Masalan: Yulduzli Tunlar",
+        save_and_finish: "Saqlash va Yakunlash",
+        shelf_menu_title: "Kitoblar Javoni",
+        shelf_menu_desc: "Kitob nomi yoki muallif nikneymi (@nik) bo'yicha qidiring va o'qing",
+        shelf_search_placeholder: "Kitob nomi yoki muallif nikneymi (@nik) kiriting...",
+        shelf_all_books: "Barcha kitoblar ko'rsatilmoqda",
+        shelf_grid_label: "Omni Shelf Grid • 3D Kutubxona",
+        publish_btn: "Kitob qo'yish",
+        published_btn: "Qo'yilganlar",
+        top_books_btn: "Top kitoblar",
+        shelf_footer_tip: "Kitoblarni o'qish va baholash uchun muqovasiga bosing",
+        my_published_title: "Qo'yilgan Kitoblaringiz Ro'yxati:",
+        my_published_hint: "Qizil tugma orqali o'chirish mumkin",
+        top10_heading: "Eng yuqori baholangan Top 10 Kitoblar:",
+        top10_sub: "Yulduzlar bo'yicha reyting",
+        publish_modal_title: "Javonga kitob qo'yish",
+        publish_modal_desc: "O'zingiz yozgan kitoblardan birini tanlab umumiy javonga joylashtiring:",
+        publish_selected_note: "Kitob tanlandi! Uni javonga joylashtirishga tayyormisiz?",
+        no_book_selected: "Kitob tanlanmadi (Yopish)",
+        rate_prompt: "Ushbu kitobga baho bering:",
+        back_to_shelf: "Javonga qaytish",
+        chat_menu_title: "Do'stlar bilan suhbat",
+        chat_menu_desc: "Hamfikr do'stlar bilan muloqot va tezkor imlo musobaqasi",
+        flag_modal_title: "Mamlakat bayrog'ingizni tanlang",
+        flag_modal_desc: "Shu bayroq orqali bir xil mamlakatdagi online do'stlaringiz bilan bog'lanasiz",
+        flag_input_placeholder: "Masalan: 🇺🇿 Uzbekistan",
+        confirm: "Tasdiqlash",
+        tab_online: "Online Do'stlar",
+        tab_close: "Yaqin Do'stlar",
+        tab_battle: "⚔️ Jang",
+        search_friend_placeholder: "Nik, Gmail yoki ism kiriting...",
+        friends_list_default: "Bayrog'ingizdagi online foydalanuvchilar:",
+        bot_title: "Mashq Boti",
+        bot_subtitle: "Yozish tezligini oshiring",
+        practice_btn: "⚔️ Mashq",
+        select_chat_partner: "Suhbatdoshni tanlang",
+        save_close_friend: "Yaqin do'st deb saqlash",
+        chat_empty_prompt: "Muloqotni boshlash uchun chap tarafdan do'stingizni tanlang",
+        chat_input_placeholder: "Xabaringizni yozing...",
+        google_modal_title: "Google hisobini tanlang",
+        challenge_toast_sub: "10 soniya ichida javob bering",
+        accept: "Ha (Qabul)",
+        decline: "Yo'q (Rad etish)",
+        battle_modal_title: "Imlo va Tez Yozuv Jangi",
+        quit: "Chiqish",
+        sample_text_label: "Namuna Matn (Jonli Tekshiruv):",
+        battle_input_label: "Yuqoridagi matnni aniq va xatosiz ko'chiring:",
+        battle_input_placeholder: "Matnni shu yerga yozishni boshlang...",
+        my_score: "Sizning Ballingiz",
+        opp_score: "Raqib Balli",
+        submit_result: "Natijani topshirish (Jangni yakunlash)",
+        error_analysis: "Xatolar va Imlo Tahlili:",
+        finish_battle: "Jangni Yakunlash"
+      },
+      ru: {
+        step1_btn: "Нажмите, чтобы войти в платформу",
+        back: "Назад",
+        login_title: "Вход в систему",
+        login_desc: "Войдите в личную библиотеку и чат с друзьями",
+        google_login: "Быстрый вход через Google",
+        or_email: "или через email",
+        login_email_label: "Логин / Email",
+        password_label: "Пароль",
+        login_error: "Пожалуйста, полностью заполните поля логина и пароля!",
+        continue: "Продолжить",
+        nick_title: "Создать никнейм",
+        nick_desc: "Выберите уникальный псевдоним. Он должен содержать минимум 1 букву и 1 цифру.",
+        nick_label: "Ваш Никнейм",
+        req_title: "Требования:",
+        req_alphanum: "Должны присутствовать буквы и цифры",
+        req_unique: "Имя не должно быть занято другим пользователем",
+        nick_submit: "Подтвердить никнейм",
+        purpose_badge: "Знакомство",
+        purpose_title: "С какой целью вы хотите использовать?",
+        purpose_desc: "Выберите готовый вариант или напишите свою цель",
+        purpose_opt1_label: "Писать книги",
+        purpose_opt1: "Я хочу писать свои истории и книги и делиться ими с другими.",
+        purpose_opt2_label: "Читать книги",
+        purpose_opt2: "Я зашел, чтобы читать интересные книги на полке и оценивать их.",
+        purpose_opt3_label: "Общение и Битва",
+        purpose_opt3: "Хочу найти друзей, общаться и соревноваться в орфографическом бою.",
+        purpose_error: "Пожалуйста, введите цель или выберите кнопку выше!",
+        purpose_input_placeholder: "Или напишите свою цель здесь...",
+        purpose_submit: "Перейти на платформу",
+        stat_written: "Написано:",
+        stat_shelf: "На полке:",
+        menu_main_title: "Главное Меню",
+        menu_main_desc: "Выберите раздел для творчества, просмотра библиотеки или орфографического боя с друзьями",
+        card1_title: "Писать книги",
+        card1_desc: "Пишите новые истории и книги, создавайте свои авторские произведения в тетради.",
+        card1_btn: "Открыть тетрадь",
+        card2_title: "Смотреть книги",
+        card2_desc: "Читайте книги на деревянной полке, ставьте 5 звезд и следите за рейтингом Топ-10.",
+        card2_btn: "Перейти к полке",
+        card3_title: "Чат с друзьями",
+        card3_desc: "Находите онлайн-друзей по флагу страны, общайтесь и вызывайте на ⚔️ Орфографический бой.",
+        card3_btn: "Войти в чат",
+        write_menu_title: "Раздел написания книг",
+        write_menu_desc: "Мастерская личных рукописей и тетрадей",
+        home_btn: "Главная",
+        write_new_title: "Написать книгу",
+        write_new_desc: "Открыть тетрадь в линейку",
+        saved_books_title: "Ваши написанные книги:",
+        search_written_placeholder: "Поиск названия книги...",
+        notebook_area_title: "Творческая тетрадь",
+        cancel: "Отмена",
+        notebook_placeholder: "Напишите свою книгу или историю здесь...",
+        save: "Сохранить",
+        modal_title_heading: "Назовите книгу",
+        modal_title_desc: "Введите красивое название для вашего произведения:",
+        modal_title_placeholder: "Например: Звездные ночи",
+        save_and_finish: "Сохранить и завершить",
+        shelf_menu_title: "Книжная полка",
+        shelf_menu_desc: "Ищите и читайте по названию книги или никнейму автора (@nik)",
+        shelf_search_placeholder: "Введите название книги или ник автора (@nik)...",
+        shelf_all_books: "Показаны все книги",
+        shelf_grid_label: "Omni Shelf Grid • 3D Библиотека",
+        publish_btn: "Выставить книгу",
+        published_btn: "Выставленные",
+        top_books_btn: "Топ книг",
+        shelf_footer_tip: "Нажмите на обложку книги, чтобы прочитать и оценить её",
+        my_published_title: "Список выставленных книг:",
+        my_published_hint: "Вы можете удалить книгу с полки красной кнопкой",
+        top10_heading: "Топ 10 книг с самым высоким рейтингом:",
+        top10_sub: "Средний рейтинг по звездам",
+        publish_modal_title: "Выставить книгу на полку",
+        publish_modal_desc: "Выберите одну из ваших написанных книг для общей полки:",
+        publish_selected_note: "Книга выбрана! Готовы выставить её на полку?",
+        no_book_selected: "Книга не выбрана (Закрыть)",
+        rate_prompt: "Оцените эту книгу:",
+        back_to_shelf: "Вернуться на полку",
+        chat_menu_title: "Чат с друзьями",
+        chat_menu_desc: "Общение с единомышленниками и быстрое орфографическое соревнование",
+        flag_modal_title: "Выберите флаг вашей страны",
+        flag_modal_desc: "Через этот флаг вы свяжетесь с онлайн-друзьями из вашей страны",
+        flag_input_placeholder: "Например: 🇺🇿 Uzbekistan",
+        confirm: "Подтвердить",
+        tab_online: "Онлайн друзья",
+        tab_close: "Близкие друзья",
+        tab_battle: "⚔️ Битва",
+        search_friend_placeholder: "Введите ник, Gmail или имя...",
+        friends_list_default: "Онлайн пользователи с вашим флагом:",
+        bot_title: "Бот для тренировок",
+        bot_subtitle: "Повышайте скорость письма",
+        practice_btn: "⚔️ Тренинг",
+        select_chat_partner: "Выберите собеседника",
+        save_close_friend: "Добавить в близкие друзья",
+        chat_empty_prompt: "Выберите друга слева, чтобы начать общение",
+        chat_input_placeholder: "Напишите ваше сообщение...",
+        google_modal_title: "Выберите аккаунт Google",
+        challenge_toast_sub: "Ответьте в течение 10 секунд",
+        accept: "Да (Принять)",
+        decline: "Нет (Отклонить)",
+        battle_modal_title: "Орфографический и скоростной бой",
+        quit: "Выход",
+        sample_text_label: "Пример текста (Живая проверка):",
+        battle_input_label: "Точно перепишите текст без ошибок:",
+        battle_input_placeholder: "Начните вводить текст здесь...",
+        my_score: "Ваш Счет",
+        opp_score: "Счет Соперника",
+        submit_result: "Отправить результат (Завершить бой)",
+        error_analysis: "Анализ ошибок и орфографии:",
+        finish_battle: "Завершить бой"
+      },
+      en: {
+        step1_btn: "Click to Enter Platform",
+        back: "Back",
+        login_title: "Sign In",
+        login_desc: "Enter your personal library and friends chat",
+        google_login: "Quick sign in with Google",
+        or_email: "or via email",
+        login_email_label: "Login / Email",
+        password_label: "Password",
+        login_error: "Please fill in both login and password fields!",
+        continue: "Continue",
+        nick_title: "Create Nickname",
+        nick_desc: "Choose a unique username. It must contain at least 1 letter and 1 number.",
+        nick_label: "Your Nickname",
+        req_title: "Requirements:",
+        req_alphanum: "Must include letters and numbers",
+        req_unique: "Must not be taken by another user",
+        nick_submit: "Confirm Nickname",
+        purpose_badge: "Introduction",
+        purpose_title: "What is your purpose?",
+        purpose_desc: "Choose a ready option or type your own goal",
+        purpose_opt1_label: "Write Books",
+        purpose_opt1: "I want to write my stories and books and share them with others.",
+        purpose_opt2_label: "Read Books",
+        purpose_opt2: "I came to read and rate interesting books on the shelf.",
+        purpose_opt3_label: "Chat & Battle",
+        purpose_opt3: "I want to find friends, chat, and test my skills in spelling battles.",
+        purpose_error: "Please enter your purpose or select a button above!",
+        purpose_input_placeholder: "Or type your goal here...",
+        purpose_submit: "Enter Platform",
+        stat_written: "Written:",
+        stat_shelf: "On Shelf:",
+        menu_main_title: "Main Menus",
+        menu_main_desc: "Choose a section to create, browse the library, or spell-battle with friends",
+        card1_title: "Write Books",
+        card1_desc: "Write new stories and books, create your copyrighted works in a lined notebook.",
+        card1_btn: "Open Notebook",
+        card2_title: "View Books",
+        card2_desc: "Read books on the wooden shelf, give 5-star ratings, and watch the Top 10 leaderboard.",
+        card2_btn: "Go to Shelf",
+        card3_title: "Friends Chat",
+        card3_desc: "Find online friends by country flag, chat, and challenge to ⚔️ Spelling Battle.",
+        card3_btn: "Enter Chat",
+        write_menu_title: "Book Writing Section",
+        write_menu_desc: "Workshop for personal manuscripts and notebooks",
+        home_btn: "Home",
+        write_new_title: "Write a New Book",
+        write_new_desc: "Open lined notebook",
+        saved_books_title: "Your written books:",
+        search_written_placeholder: "Search book title...",
+        notebook_area_title: "Creative Notebook Area",
+        cancel: "Cancel",
+        notebook_placeholder: "Write your book or story here...",
+        save: "Save",
+        modal_title_heading: "Name Your Book",
+        modal_title_desc: "Enter a title for your masterpiece:",
+        modal_title_placeholder: "Example: Starry Nights",
+        save_and_finish: "Save & Finish",
+        shelf_menu_title: "Bookshelf",
+        shelf_menu_desc: "Search and read by book title or author nickname (@nik)",
+        shelf_search_placeholder: "Enter book title or author nickname (@nik)...",
+        shelf_all_books: "Showing all books",
+        shelf_grid_label: "Omni Shelf Grid • 3D Library",
+        publish_btn: "Publish Book",
+        published_btn: "Published",
+        top_books_btn: "Top Books",
+        shelf_footer_tip: "Click a book cover to read and rate it",
+        my_published_title: "List of Published Books:",
+        my_published_hint: "You can remove books from the shelf using the red button",
+        top10_heading: "Top 10 Highest Rated Books:",
+        top10_sub: "Average star rating",
+        publish_modal_title: "Publish Book to Shelf",
+        publish_modal_desc: "Select one of your written books to place on the general shelf:",
+        publish_selected_note: "Book selected! Ready to place it on the shelf?",
+        no_book_selected: "No book selected (Close)",
+        rate_prompt: "Rate this book:",
+        back_to_shelf: "Back to Shelf",
+        chat_menu_title: "Friends Chat",
+        chat_menu_desc: "Communication with like-minded friends and quick spelling competition",
+        flag_modal_title: "Select Your Country Flag",
+        flag_modal_desc: "Through this flag you connect with online friends from the same country",
+        flag_input_placeholder: "Example: 🇺🇿 Uzbekistan",
+        confirm: "Confirm",
+        tab_online: "Online Friends",
+        tab_close: "Close Friends",
+        tab_battle: "⚔️ Battle",
+        search_friend_placeholder: "Enter nick, Gmail or name...",
+        friends_list_default: "Online users with your flag:",
+        bot_title: "Practice Bot",
+        bot_subtitle: "Improve typing speed",
+        practice_btn: "⚔️ Practice",
+        select_chat_partner: "Select chat partner",
+        save_close_friend: "Save as close friend",
+        chat_empty_prompt: "Select a friend from the left to start chatting",
+        chat_input_placeholder: "Type your message...",
+        google_modal_title: "Select Google Account",
+        challenge_toast_sub: "Respond within 10 seconds",
+        accept: "Yes (Accept)",
+        decline: "No (Decline)",
+        battle_modal_title: "Spelling & Speed Battle",
+        quit: "Quit",
+        sample_text_label: "Sample Text (Live Check):",
+        battle_input_label: "Accurately copy the text above without errors:",
+        battle_input_placeholder: "Start typing the text here...",
+        my_score: "Your Score",
+        opp_score: "Opponent Score",
+        submit_result: "Submit Result (Finish Battle)",
+        error_analysis: "Errors & Spelling Analysis:",
+        finish_battle: "Finish Battle"
+      }
+    };
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem('omni_lang', lang);
+
+      document.getElementById('langBtnUz').className = lang === 'uz' ? "px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-sky-500 text-white shadow" : "px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition-all";
+      document.getElementById('langBtnRu').className = lang === 'ru' ? "px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-sky-500 text-white shadow" : "px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition-all";
+      document.getElementById('langBtnEn').className = lang === 'en' ? "px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-sky-500 text-white shadow" : "px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition-all";
+
+      const dict = i18nData[lang] || i18nData.uz;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) {
+          el.textContent = dict[key];
+        }
+      });
+
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (dict[key]) {
+          el.placeholder = dict[key];
+        }
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      setLanguage(currentLang);
+    });
+
+    // --- TOAST XABARNOMA ---
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('globalToast');
+      const icon = document.getElementById('toastIcon');
+      const msg = document.getElementById('toastMessage');
+
+      msg.textContent = message;
+      if (type === 'success') {
+        icon.className = "fa-solid fa-circle-check text-emerald-400 text-lg";
+      } else if (type === 'error') {
+        icon.className = "fa-solid fa-triangle-exclamation text-red-400 text-lg";
+      } else {
+        icon.className = "fa-solid fa-circle-info text-sky-400 text-lg";
+      }
+
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // --- QORA TUYNUK O'TISH ANIMATSIYASI ---
+    function triggerVortexTransition(fromId, toId) {
+      const vortex = document.getElementById('vortexOverlay');
+      vortex.classList.add('active');
+
+      setTimeout(() => {
+        document.getElementById(fromId).classList.add('hidden');
+        document.getElementById(toId).classList.remove('hidden');
+
+        if (toId === 'step4') updateDashboardStats();
+        if (toId === 'menuWrite') renderSavedBooksList();
+        if (toId === 'menuLibrary') renderShelfGrid();
+        if (toId === 'menuChat') initChatModule();
+
+        vortex.classList.remove('active');
+        vortex.classList.add('closing');
+
+        setTimeout(() => {
+          vortex.classList.remove('closing');
+        }, 550);
+      }, 550);
+    }
+
+    function updateDashboardStats() {
+      document.getElementById('statWrittenCount').textContent = myBooks.length;
+      document.getElementById('statShelfCount').textContent = publishedBooks.length;
+      document.getElementById('dashboardUserGreeting').textContent = `Xush kelibsiz, ${currentUserName}!`;
+      document.getElementById('dashboardNicknameBadge').textContent = `@${userNickname || 'muallif1'}`;
+    }
+
+    // --- LOGIN, NIKNEYM VA MAQSAD ---
+    function togglePasswordVisibility() {
+      const input = document.getElementById('passwordInput');
+      const icon = document.getElementById('passwordEyeIcon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fa-regular fa-eye-slash text-sm';
+      } else {
+        input.type = 'password';
+        icon.className = 'fa-regular fa-eye text-sm';
+      }
+    }
+
+    function handleLoginSubmit(event) {
+      event.preventDefault();
+      const loginInput = document.getElementById('loginInput');
+      const passwordInput = document.getElementById('passwordInput');
+      const errorBox = document.getElementById('loginError');
+
+      loginInput.classList.remove('input-error');
+      passwordInput.classList.remove('input-error');
+      errorBox.classList.add('hidden');
+
+      if (!loginInput.value.trim() || !passwordInput.value.trim()) {
+        loginInput.classList.add('input-error');
+        passwordInput.classList.add('input-error');
+        errorBox.classList.remove('hidden');
+        return;
+      }
+
+      userEmail = loginInput.value.trim().toLowerCase();
+      const emailName = userEmail.split('@')[0];
+      currentUserName = emailName.charAt(0).toUpperCase() + emailName.slice(1);
+      localStorage.setItem('current_user_name', currentUserName);
+      localStorage.setItem('user_email', userEmail);
+
+      showToast("Email tasdiqlandi! Endi nikneym yarating.", "info");
+      triggerVortexTransition('step2', 'stepNickname');
+    }
+
+    function handleGoogleLogin() {
+      document.getElementById('googleModal').classList.add('open');
+    }
+
+    function closeGoogleModal() {
+      document.getElementById('googleModal').classList.remove('open');
+    }
+
+    function confirmGoogleAuth(name, email) {
+      currentUserName = name;
+      userEmail = email.toLowerCase();
+      localStorage.setItem('current_user_name', currentUserName);
+      localStorage.setItem('user_email', userEmail);
+      closeGoogleModal();
+      showToast(`${name} Google orqali ulandi!`, "success");
+      triggerVortexTransition('step2', 'stepNickname');
+    }
+
+    function checkNicknameRules(rawVal) {
+      const clean = rawVal.trim().replace(/^@+/, '').toLowerCase();
+      const hasLetter = /[a-zA-Z]/.test(clean);
+      const hasNumber = /[0-9]/.test(clean);
+      const validChars = /^[a-zA-Z0-9_]+$/.test(clean);
+      const isAlphaNum = clean.length >= 3 && hasLetter && hasNumber && validChars;
+      const isTaken = takenNicknames.some(n => n.toLowerCase() === clean && clean !== userNickname.toLowerCase());
+
+      return { clean, isAlphaNum, isTaken };
+    }
+
+    function validateNicknameLive() {
+      const input = document.getElementById('nicknameInput');
+      const feedback = document.getElementById('nicknameFeedback');
+      const statusIcon = document.getElementById('nicknameStatusIcon');
+      const reqAlphaNum = document.getElementById('reqAlphaNum');
+      const reqUnique = document.getElementById('reqUnique');
+
+      input.classList.remove('input-error');
+      const { clean, isAlphaNum, isTaken } = checkNicknameRules(input.value);
+
+      if (!clean) {
+        feedback.classList.add('hidden');
+        statusIcon.innerHTML = '';
+        reqAlphaNum.innerHTML = `<i class="fa-regular fa-circle text-slate-500"></i> <span data-i18n="req_alphanum">Harf va raqam qatnashgan bo'lishi kerak</span>`;
+        reqUnique.innerHTML = `<i class="fa-regular fa-circle text-slate-500"></i> <span data-i18n="req_unique">Boshqa foydalanuvchi band qilmagan bo'lishi kerak</span>`;
+        return;
+      }
+
+      reqAlphaNum.innerHTML = isAlphaNum
+        ? `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span class="text-emerald-300">Harf va raqam sharti bajarildi</span>`
+        : `<i class="fa-solid fa-circle-xmark text-red-400"></i> <span class="text-red-300">Nikneymda harf ham, raqam ham bo'lishi shart!</span>`;
+
+      reqUnique.innerHTML = !isTaken
+        ? `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span class="text-emerald-300">Bu nikneym bo'sh</span>`
+        : `<i class="fa-solid fa-circle-xmark text-red-400"></i> <span class="text-red-300">Noto'g'ri! Bu nikneym band</span>`;
+
+      if (isTaken) {
+        statusIcon.innerHTML = `<i class="fa-solid fa-circle-xmark text-red-400 text-lg"></i>`;
+        feedback.className = "text-xs font-medium rounded-xl p-3 flex items-center gap-2 bg-red-500/15 border border-red-500/35 text-red-300";
+        feedback.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-red-400 text-base shrink-0"></i> <span>Noto'g'ri! <b>@${escapeHtml(clean)}</b> nikneymi band, boshqa nikneym qo'ying!</span>`;
+      } else if (!isAlphaNum) {
+        statusIcon.innerHTML = `<i class="fa-solid fa-circle-exclamation text-amber-400 text-lg"></i>`;
+        feedback.className = "text-xs font-medium rounded-xl p-3 flex items-center gap-2 bg-amber-500/15 border border-amber-500/35 text-amber-200";
+        feedback.innerHTML = `<i class="fa-solid fa-circle-info text-amber-400 text-base shrink-0"></i> <span>Nikneym kamida bitta harf va bitta raqamni o'z ichiga olsin!</span>`;
+      } else {
+        statusIcon.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>`;
+        feedback.className = "text-xs font-medium rounded-xl p-3 flex items-center gap-2 bg-emerald-500/15 border border-emerald-500/35 text-emerald-300";
+        feedback.innerHTML = `<i class="fa-solid fa-check text-emerald-400 text-base shrink-0"></i> <span>Ajoyib! <b>@${escapeHtml(clean)}</b> nikneymi tayyor.</span>`;
+      }
+    }
+
+    function handleNicknameSubmit(event) {
+      event.preventDefault();
+      const input = document.getElementById('nicknameInput');
+      const { clean, isAlphaNum, isTaken } = checkNicknameRules(input.value);
+
+      validateNicknameLive();
+
+      if (!clean || !isAlphaNum || isTaken) {
+        input.classList.add('input-error');
+        if (isTaken) {
+          showToast("Noto'g'ri! Bu nikneym band, boshqa nikneym qo'ying!", "error");
+        } else {
+          showToast("Nikneym harf va raqamdan iborat bo'lishi shart!", "warning");
+        }
+        return;
+      }
+
+      userNickname = clean;
+      localStorage.setItem('user_nickname', userNickname);
+
+      if (!takenNicknames.includes(userNickname)) {
+        takenNicknames.push(userNickname);
+        localStorage.setItem('taken_nicknames', JSON.stringify(takenNicknames));
+      }
+
+      showToast(`Nikneym tasdiqlandi: @${userNickname}`, "success");
+      triggerVortexTransition('stepNickname', 'step3');
+    }
+
+    function fillPurpose(text) {
+      document.getElementById('purposeInput').value = text;
+      document.getElementById('purposeError').classList.add('hidden');
+    }
+
+    function handlePurposeSubmit(event) {
+      event.preventDefault();
+      const val = document.getElementById('purposeInput').value.trim();
+      if (!val) {
+        document.getElementById('purposeError').classList.remove('hidden');
+        return;
+      }
+      document.getElementById('purposeError').classList.add('hidden');
+      triggerVortexTransition('step3', 'step4');
+    }
+
+    // --- BO'LIM 1: KITOB YOZISH VA QIDIRUV ---
+    function openNotebookEditor() {
+      document.getElementById('writeSubMenu').classList.add('hidden');
+      document.getElementById('notebookEditor').classList.remove('hidden');
+      document.getElementById('notebookText').value = "";
+      updateNotebookStats();
+    }
+
+    function closeNotebookToSubmenu() {
+      document.getElementById('notebookEditor').classList.add('hidden');
+      document.getElementById('writeSubMenu').classList.remove('hidden');
+    }
+
+    function updateNotebookStats() {
+      const text = document.getElementById('notebookText').value.trim();
+      const words = text ? text.split(/\s+/).length : 0;
+      const chars = text.length;
+      document.getElementById('notebookWordCounter').textContent = `${words} ta so'z • ${chars} ta belgi`;
+    }
+
+    function saveBookDraft() {
+      const text = document.getElementById('notebookText').value.trim();
+      if (!text) {
+        showToast("Iltimos, avval daftarga nimadir yozing!", "warning");
+        return;
+      }
+      currentDraftText = text;
+      document.getElementById('titleModal').classList.add('open');
+      setTimeout(() => document.getElementById('bookTitleInput').focus(), 150);
+    }
+
+    function closeTitleModal() {
+      document.getElementById('titleModal').classList.remove('open');
+    }
+
+    function confirmSaveBookTitle() {
+      const titleInput = document.getElementById('bookTitleInput');
+      const title = titleInput.value.trim();
+      if (!title) {
+        showToast("Iltimos, kitobga nom bering!", "warning");
+        titleInput.focus();
+        return;
+      }
+
+      const newBook = {
+        id: Date.now(),
+        title: title,
+        authorNickname: userNickname || 'muallif1',
+        content: currentDraftText,
+        date: new Date().toLocaleDateString()
+      };
+
+      myBooks.unshift(newBook);
+      localStorage.setItem('my_written_books', JSON.stringify(myBooks));
+
+      titleInput.value = "";
+      closeTitleModal();
+      closeNotebookToSubmenu();
+      renderSavedBooksList();
+      showToast(`"${title}" muvaffaqiyatli saqlandi!`, "success");
+    }
+
+    function clearWrittenBooksSearch() {
+      const input = document.getElementById('writtenBooksSearchInput');
+      if (input) {
+        input.value = '';
+        renderSavedBooksList();
+        input.focus();
+      }
+    }
+
+    function renderSavedBooksList() {
+      const container = document.getElementById('mySavedBooksList');
+      const badge = document.getElementById('savedCountBadge');
+      const searchInput = document.getElementById('writtenBooksSearchInput');
+      const clearBtn = document.getElementById('clearWrittenSearchBtn');
+
+      const rawQuery = (searchInput?.value || '').trim();
+      const query = rawQuery.toLowerCase();
+
+      if (clearBtn) {
+        clearBtn.classList.toggle('hidden', rawQuery.length === 0);
+      }
+
+      const filteredBooks = myBooks.filter(book => {
+        if (!query) return true;
+        return book.title.toLowerCase().includes(query) || book.content.toLowerCase().includes(query);
+      });
+
+      badge.textContent = rawQuery ? `${filteredBooks.length} / ${myBooks.length} ta` : `${myBooks.length} ta`;
+
+      if (myBooks.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500 col-span-full py-8 text-center">Hali saqlangan kitoblar yo'q. Chapdagi tugma orqali yozishni boshlang!</p>`;
+        return;
+      }
+
+      if (filteredBooks.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-400 col-span-full py-8 text-center">"${escapeHtml(rawQuery)}" nomi bo'yicha yozgan kitobingiz topilmadi</p>`;
+        return;
+      }
+
+      container.innerHTML = filteredBooks.map(book => `
+        <div onclick="openReadBookModal(${book.id}, 'written')" class="bg-slate-900/90 border border-slate-800 hover:border-sky-400/60 p-3.5 rounded-2xl flex flex-col justify-between cursor-pointer transition-all group">
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <i class="fa-solid fa-book-bookmark text-sky-400 text-base"></i>
+              <span class="font-mono text-[10px] text-indigo-300">@${escapeHtml(book.authorNickname || userNickname || 'muallif1')}</span>
+            </div>
+            <h5 class="font-outfit font-bold text-sm text-white group-hover:text-sky-300 truncate">${escapeHtml(book.title)}</h5>
+            <p class="text-xs text-slate-400 mt-1 line-clamp-2">${escapeHtml(book.content)}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // --- BO'LIM 2: JAVON, QIDIRUV VA BAHOLASH ---
+    function openPublishModal() {
+      selectedBookToPublishId = null;
+      const modal = document.getElementById('publishModal');
+      const selectArea = document.getElementById('publishBookSelectArea');
+      
+      document.getElementById('confirmWarningText').classList.add('hidden');
+      updatePublishButtonState();
+
+      if (myBooks.length === 0) {
+        selectArea.innerHTML = `<div class="text-xs text-slate-400 py-6 text-center bg-slate-950/60 rounded-2xl border border-slate-800">Sizda hali yozilgan kitob yo'q. Avval asar yarating.</div>`;
+      } else {
+        selectArea.innerHTML = myBooks.map(book => `
+          <div onclick="selectBookToPublish(${book.id}, this)" class="publish-item p-3.5 bg-slate-900/80 border border-slate-800 hover:border-indigo-500 rounded-2xl cursor-pointer flex items-center justify-between text-xs transition-all">
+            <div>
+              <span class="font-bold text-white block text-sm">${escapeHtml(book.title)}</span>
+              <span class="text-[11px] text-slate-400">${book.date}</span>
+            </div>
+            <i class="fa-regular fa-circle text-slate-400 text-base check-icon"></i>
+          </div>
+        `).join('');
+      }
+
+      modal.classList.add('open');
+    }
+
+    function closePublishModal() {
+      document.getElementById('publishModal').classList.remove('open');
+    }
+
+    function selectBookToPublish(bookId, element) {
+      selectedBookToPublishId = bookId;
+      
+      document.querySelectorAll('.publish-item').forEach(el => {
+        el.classList.remove('border-indigo-500', 'bg-indigo-950/50');
+        el.querySelector('.check-icon').className = 'fa-regular fa-circle text-slate-400 text-base check-icon';
+      });
+
+      element.classList.add('border-indigo-500', 'bg-indigo-950/50');
+      element.querySelector('.check-icon').className = 'fa-solid fa-circle-check text-emerald-400 text-base check-icon';
+
+      document.getElementById('confirmWarningText').classList.remove('hidden');
+      updatePublishButtonState();
+    }
+
+    function updatePublishButtonState() {
+      const btn = document.getElementById('publishActionBtn');
+      const btnText = document.getElementById('publishActionBtnText');
+
+      if (selectedBookToPublishId === null) {
+        btn.className = "w-full py-3.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-all flex items-center justify-center gap-2 text-sm";
+        btnText.textContent = "Kitob tanlanmadi (Yopish)";
+      } else {
+        btn.className = "w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/25 text-sm";
+        btnText.textContent = "Javonga qo'yish (Chop etish)";
+      }
+    }
+
+    function handlePublishAction() {
+      if (selectedBookToPublishId === null) {
+        closePublishModal();
+        return;
+      }
+
+      const book = myBooks.find(b => b.id === selectedBookToPublishId);
+      if (book) {
+        const alreadyExists = publishedBooks.some(b => b.id === book.id);
+        if (alreadyExists) {
+          showToast("Bu kitob allaqachon javonga qo'yilgan!", "warning");
+          closePublishModal();
+          return;
+        }
+        publishedBooks.push({
+          ...book,
+          authorNickname: book.authorNickname || userNickname || 'muallif1'
+        });
+        localStorage.setItem('my_published_books', JSON.stringify(publishedBooks));
+        renderShelfGrid();
+        renderPublishedList();
+        showToast(`"${book.title}" javonga muvaffaqiyatli qo'yildi!`, "success");
+      }
+
+      closePublishModal();
+    }
+
+    function openReadBookModal(bookId, source = 'published') {
+      const pool = source === 'written' ? myBooks : [...publishedBooks, ...myBooks];
+      const book = pool.find(b => b.id === bookId);
+      if (!book) return;
+
+      activeReadingBookId = book.id;
+      document.getElementById('readBookModalTitle').textContent = book.title;
+      document.getElementById('readBookModalDate').textContent = `Muallif: @${book.authorNickname || 'muallif1'} • Sana: ${book.date || 'Nashr etilgan'}`;
+      document.getElementById('readBookModalContent').textContent = book.content;
+
+      updateStarUI();
+      document.getElementById('readBookModal').classList.add('open');
+    }
+
+    function closeReadBookModal() {
+      document.getElementById('readBookModal').classList.remove('open');
+    }
+
+    function rateCurrentBook(stars) {
+      if (!activeReadingBookId) return;
+
+      if (!bookRatings[activeReadingBookId]) {
+        bookRatings[activeReadingBookId] = { ratingSum: 0, count: 0, myRating: 0 };
+      }
+
+      const bookData = bookRatings[activeReadingBookId];
+      if (bookData.myRating) {
+        bookData.ratingSum = bookData.ratingSum - bookData.myRating + stars;
+      } else {
+        bookData.ratingSum += stars;
+        bookData.count += 1;
+      }
+      bookData.myRating = stars;
+
+      localStorage.setItem('book_ratings', JSON.stringify(bookRatings));
+      updateStarUI();
+      renderShelfGrid();
+      if (!document.getElementById('topBooksPanel').classList.contains('hidden')) {
+        renderTopBooksList();
+      }
+      showToast(`Kitobga ${stars} yulduz baho berdingiz!`, "success");
+    }
+
+    function updateStarUI() {
+      if (!activeReadingBookId) return;
+      const data = bookRatings[activeReadingBookId] || { ratingSum: 0, count: 0, myRating: 0 };
+      const avg = data.count > 0 ? (data.ratingSum / data.count).toFixed(1) : "0.0";
+
+      document.getElementById('bookRatingBadge').textContent = `${avg} ⭐ (${data.count} ta baho)`;
+
+      const stars = document.querySelectorAll('#starRatingGroup .star-btn');
+      stars.forEach((star, index) => {
+        if (index < (data.myRating || 0)) {
+          star.className = "star-btn fa-solid fa-star text-amber-400 transition-transform hover:scale-110";
+        } else {
+          star.className = "star-btn fa-regular fa-star text-slate-600 hover:text-amber-400 transition-transform hover:scale-110";
+        }
+      });
+    }
+
+    function toggleTopBooksView() {
+      const panel = document.getElementById('topBooksPanel');
+      document.getElementById('publishedBooksPanel').classList.add('hidden');
+      panel.classList.toggle('hidden');
+      if (!panel.classList.contains('hidden')) {
+        renderTopBooksList();
+      }
+    }
+
+    function renderTopBooksList() {
+      const container = document.getElementById('topBooksList');
+      const uniqueBooksMap = new Map();
+      [...publishedBooks, ...myBooks].forEach(b => uniqueBooksMap.set(b.id, b));
+      const booksList = Array.from(uniqueBooksMap.values());
+
+      if (booksList.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Kitoblar topilmadi.</p>`;
+        return;
+      }
+
+      const sortedBooks = booksList.map(book => {
+        const rData = bookRatings[book.id] || { ratingSum: 0, count: 0 };
+        const avg = rData.count > 0 ? (rData.ratingSum / rData.count) : 0;
+        return { ...book, avgRating: avg, ratingCount: rData.count };
+      }).sort((a, b) => b.avgRating - a.avgRating || b.ratingCount - a.ratingCount).slice(0, 10);
+
+      container.innerHTML = sortedBooks.map((book, idx) => {
+        const rankStyle = idx === 0
+          ? 'bg-gradient-to-br from-amber-400 to-yellow-600 text-slate-950 font-black shadow-md shadow-amber-500/30'
+          : idx === 1
+          ? 'bg-gradient-to-br from-slate-200 to-slate-400 text-slate-950 font-black'
+          : idx === 2
+          ? 'bg-gradient-to-br from-amber-600 to-orange-800 text-white font-black'
+          : 'bg-slate-800 text-slate-400 font-bold';
+
+        return `
+          <div onclick="openReadBookModal(${book.id})" class="bg-slate-900/90 border border-amber-500/20 hover:border-amber-400/60 p-3.5 rounded-2xl flex items-center justify-between cursor-pointer transition-all group">
+            <div class="flex items-center gap-3.5 min-w-0">
+              <span class="w-8 h-8 rounded-xl ${rankStyle} flex items-center justify-center text-xs shrink-0">
+                #${idx + 1}
+              </span>
+              <div class="truncate">
+                <h5 class="font-outfit font-bold text-xs sm:text-sm text-white group-hover:text-amber-300 truncate">${escapeHtml(book.title)}</h5>
+                <span class="font-mono text-[10px] text-indigo-300">@${escapeHtml(book.authorNickname || 'muallif1')}</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 text-amber-400 font-mono font-bold text-xs shrink-0 ml-2">
+              <span>${book.avgRating.toFixed(1)}</span>
+              <i class="fa-solid fa-star text-sm"></i>
+              <span class="text-[11px] text-slate-500 font-normal">(${book.ratingCount})</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function clearShelfSearch() {
+      const input = document.getElementById('shelfSearchInput');
+      if (input) {
+        input.value = '';
+        renderShelfGrid();
+        input.focus();
+      }
+    }
+
+    function renderShelfGrid() {
+      const shelf = document.getElementById('shelfGrid');
+      const inputEl = document.getElementById('shelfSearchInput');
+      const clearBtn = document.getElementById('clearShelfSearchBtn');
+      const metaEl = document.getElementById('shelfSearchMeta');
+
+      const rawQuery = (inputEl?.value || '').trim();
+      const query = rawQuery.toLowerCase().replace(/^@+/, '');
+
+      if (clearBtn) {
+        clearBtn.classList.toggle('hidden', rawQuery.length === 0);
+      }
+
+      const filtered = publishedBooks.filter(b => {
+        if (!query) return true;
+        const titleMatch = b.title.toLowerCase().includes(query);
+        const authorMatch = (b.authorNickname || '').toLowerCase().includes(query);
+        return titleMatch || authorMatch;
+      });
+
+      document.getElementById('shelfTotalBadge').textContent = `${filtered.length} / ${publishedBooks.length} ta`;
+      if (metaEl) {
+        metaEl.textContent = rawQuery
+          ? `"${rawQuery}" bo'yicha ${filtered.length} ta natija`
+          : `Barcha kitoblar ko'rsatilmoqda`;
+      }
+
+      if (filtered.length === 0) {
+        shelf.innerHTML = `<div class="col-span-full flex flex-col items-center justify-center text-amber-200/60 text-xs py-12 font-outfit gap-2">
+          <i class="fa-solid fa-book-open text-2xl opacity-50"></i>
+          <span>${rawQuery ? `"${escapeHtml(rawQuery)}" nomi yoki nikneymi bo'yicha kitob topilmadi` : "Javon bo'sh. Pastdagi tugma orqali kitob qo'ying"}</span>
+        </div>`;
+        return;
+      }
+
+      shelf.innerHTML = filtered.map((book, idx) => {
+        const rData = bookRatings[book.id] || { ratingSum: 0, count: 0 };
+        const avg = rData.count > 0 ? (rData.ratingSum / rData.count).toFixed(1) : "0.0";
+        const theme = bookThemes[idx % bookThemes.length];
+        const authorTag = book.authorNickname || 'muallif1';
+
+        return `
+          <div onclick="openReadBookModal(${book.id})" class="book-spine-card bg-gradient-to-br ${theme} border-2 rounded-xl p-3 flex flex-col justify-between h-40 cursor-pointer group">
+            <div class="flex justify-between items-center">
+              <span class="font-mono text-[10px] font-bold text-amber-100 bg-black/45 px-2 py-0.5 rounded-md flex items-center gap-1">
+                <i class="fa-solid fa-star text-amber-400 text-[9px]"></i> ${avg}
+              </span>
+              <i class="fa-solid fa-bookmark text-amber-200/80 text-xs group-hover:scale-125 transition-transform"></i>
+            </div>
+            <div>
+              <div class="font-outfit font-bold text-xs sm:text-sm text-white line-clamp-2 leading-snug drop-shadow mb-1">${escapeHtml(book.title)}</div>
+              <span class="font-mono text-[10px] text-amber-200/90 bg-black/30 px-1.5 py-0.5 rounded inline-block truncate max-w-full">@${escapeHtml(authorTag)}</span>
+            </div>
+            <div class="text-[10px] text-white/75 font-mono flex items-center justify-between pt-1 border-t border-white/10">
+              <span>O'qish</span>
+              <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function togglePublishedView() {
+      const panel = document.getElementById('publishedBooksPanel');
+      document.getElementById('topBooksPanel').classList.add('hidden');
+      panel.classList.toggle('hidden');
+      if (!panel.classList.contains('hidden')) {
+        renderPublishedList();
+      }
+    }
+
+    function renderPublishedList() {
+      const container = document.getElementById('publishedList');
+      if (publishedBooks.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500 col-span-full text-center py-3">Hali qo'yilgan kitoblar yo'q</p>`;
+        return;
+      }
+
+      container.innerHTML = publishedBooks.map(book => `
+        <div class="bg-slate-900/90 border border-slate-800 p-3.5 rounded-xl flex items-center justify-between gap-2">
+          <div class="truncate cursor-pointer" onclick="openReadBookModal(${book.id})">
+            <h5 class="font-outfit font-bold text-xs sm:text-sm text-white truncate hover:text-sky-400">${escapeHtml(book.title)}</h5>
+            <span class="text-[10px] text-slate-400">Javonda saqlangan</span>
+          </div>
+          <button onclick="deletePublishedBook(${book.id})" class="px-3 py-1.5 bg-red-600/90 hover:bg-red-500 text-white font-bold text-xs rounded-lg flex items-center gap-1 transition-colors shrink-0">
+            <i class="fa-solid fa-trash-can"></i> O'chirish
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function deletePublishedBook(bookId) {
+      publishedBooks = publishedBooks.filter(b => b.id !== bookId);
+      localStorage.setItem('my_published_books', JSON.stringify(publishedBooks));
+      renderShelfGrid();
+      renderPublishedList();
+      showToast("Kitob javondan olib tashlandi", "info");
+    }
+
+    // --- BO'LIM 3: DO'STLAR CHATI, NIK/GMAIL QIDIRUV VA BOT ---
+    function initChatModule() {
+      if (!userFlag) {
+        document.getElementById('flagSelectionBox').classList.remove('hidden');
+        document.getElementById('chatMainBox').classList.add('hidden');
+      } else {
+        document.getElementById('flagSelectionBox').classList.add('hidden');
+        document.getElementById('chatMainBox').classList.remove('hidden');
+        
+        const badge = document.getElementById('userFlagBadge');
+        badge.textContent = userFlag;
+        badge.classList.remove('hidden');
+
+        renderFriendsList();
+      }
+    }
+
+    function changeUserFlag() {
+      userFlag = '';
+      localStorage.removeItem('user_flag');
+      document.getElementById('userFlagBadge').classList.add('hidden');
+      initChatModule();
+    }
+
+    function setFlag(flagStr) {
+      document.getElementById('flagInput').value = flagStr;
+    }
+
+    function confirmUserFlag() {
+      const val = document.getElementById('flagInput').value.trim();
+      if (!val) {
+        showToast("Iltimos, mamlakat bayrog'ingizni tanlang!", "warning");
+        return;
+      }
+      userFlag = val;
+      localStorage.setItem('user_flag', userFlag);
+      initChatModule();
+      showToast(`Bayroq tanlandi: ${userFlag}`, "success");
+    }
+
+    function switchChatTab(tab) {
+      activeChatTab = tab;
+      const onlineBtn = document.getElementById('tabOnlineBtn');
+      const closeBtn = document.getElementById('tabCloseFriendsBtn');
+      const battleBtn = document.getElementById('tabBattleBtn');
+
+      onlineBtn.className = "py-3 px-5 text-xs sm:text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2 whitespace-nowrap";
+      closeBtn.className = "py-3 px-5 text-xs sm:text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2 whitespace-nowrap";
+      battleBtn.className = "py-3 px-5 text-xs sm:text-sm font-bold border-b-2 border-transparent text-red-400 hover:text-red-300 flex items-center gap-2 whitespace-nowrap bg-red-500/10 rounded-t-xl";
+
+      if (tab === 'online') {
+        onlineBtn.className = "py-3 px-5 text-xs sm:text-sm font-bold border-b-2 border-emerald-500 text-emerald-400 flex items-center gap-2 whitespace-nowrap";
+        document.getElementById('friendsListTitle').textContent = "Bayrog'ingizdagi online foydalanuvchilar:";
+      } else if (tab === 'close') {
+        closeBtn.className = "py-3 px-5 text-xs sm:text-sm font-bold border-b-2 border-amber-500 text-amber-400 flex items-center gap-2 whitespace-nowrap";
+        document.getElementById('friendsListTitle').textContent = "Yaqin do'stlaringiz:";
+      } else if (tab === 'battle') {
+        battleBtn.className = "py-3 px-5 text-xs sm:text-sm font-bold border-b-2 border-red-500 text-red-300 flex items-center gap-2 whitespace-nowrap bg-red-500/20 rounded-t-xl";
+        document.getElementById('friendsListTitle').textContent = "⚔️ Jang qilish uchun do'stni tanlang:";
+      }
+
+      selectedChatUser = null;
+      resetChatArea();
+      renderFriendsList();
+    }
+
+    function clearFriendSearch() {
+      const input = document.getElementById('friendSearchInput');
+      if (input) {
+        input.value = '';
+        renderFriendsList();
+        input.focus();
+      }
+    }
+
+    function renderFriendsList() {
+      const container = document.getElementById('friendsListContainer');
+      const searchInput = document.getElementById('friendSearchInput');
+      const clearBtn = document.getElementById('clearFriendSearchBtn');
+      const rawSearch = (searchInput?.value || '').trim();
+      const searchQuery = rawSearch.toLowerCase().replace(/^@+/, '');
+
+      if (clearBtn) {
+        clearBtn.classList.toggle('hidden', rawSearch.length === 0);
+      }
+
+      const onlineFriends = mockUsers.filter(u =>
+        u.flag.toLowerCase().includes(userFlag.toLowerCase()) ||
+        userFlag.toLowerCase().includes(u.flag.toLowerCase())
+      );
+      document.getElementById('onlineCountBadge').textContent = onlineFriends.filter(u => u.isOnline).length;
+      
+      const closeFriends = mockUsers.filter(u => closeFriendsIds.includes(u.id));
+      document.getElementById('closeFriendsCountBadge').textContent = closeFriends.length;
+
+      let targetList = [];
+
+      // Nikneym, Gmail yoki Ism bo'yicha qidiruv
+      if (searchQuery) {
+        document.getElementById('friendsListTitle').textContent = `Qidiruv natijalari ("${rawSearch}"):`;
+        targetList = mockUsers.filter(u =>
+          u.nickname.toLowerCase().includes(searchQuery) ||
+          u.email.toLowerCase().includes(searchQuery) ||
+          u.name.toLowerCase().includes(searchQuery)
+        );
+      } else if (activeChatTab === 'online') {
+        document.getElementById('friendsListTitle').textContent = "Bayrog'ingizdagi online foydalanuvchilar:";
+        targetList = onlineFriends.filter(u => u.isOnline);
+      } else if (activeChatTab === 'close') {
+        document.getElementById('friendsListTitle').textContent = "Yaqin do'stlaringiz:";
+        targetList = closeFriends;
+      } else if (activeChatTab === 'battle') {
+        document.getElementById('friendsListTitle').textContent = "⚔️ Jang qilish uchun do'stni tanlang:";
+        const combined = new Map();
+        [...closeFriends, ...onlineFriends].forEach(u => combined.set(u.id, u));
+        targetList = Array.from(combined.values());
+      }
+
+      if (targetList.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">${searchQuery ? `"${escapeHtml(rawSearch)}" bo'yicha foydalanuvchi topilmadi` : 'Foydalanuvchilar topilmadi'}</p>`;
+        return;
+      }
+
+      container.innerHTML = targetList.map(u => {
+        const isClose = closeFriendsIds.includes(u.id);
+        const isSelected = selectedChatUser && selectedChatUser.id === u.id;
+        
+        return `
+          <div onclick="selectUserToChat(${u.id})" class="p-2.5 rounded-xl border ${isSelected ? 'bg-emerald-950/60 border-emerald-500/70' : 'bg-slate-900/70 border-slate-800 hover:border-slate-600'} cursor-pointer flex items-center justify-between transition-all">
+            <div class="flex items-center gap-2.5 truncate">
+              <div class="relative shrink-0">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-slate-700 to-slate-800 text-white flex items-center justify-center text-xs font-bold">${u.avatar}</div>
+                <span class="w-2.5 h-2.5 rounded-full absolute bottom-0 right-0 border-2 border-slate-950 ${u.isOnline ? 'bg-emerald-500' : 'bg-slate-500'}"></span>
+              </div>
+              <div class="truncate">
+                <div class="flex items-center gap-1.5">
+                  <h5 class="font-outfit font-bold text-xs text-white truncate">${u.name}</h5>
+                  <span class="font-mono text-[10px] text-indigo-300">@${u.nickname}</span>
+                </div>
+                <span class="text-[10px] text-slate-400 block truncate">${searchQuery ? u.email : u.flag}</span>
+              </div>
+            </div>
+            ${activeChatTab === 'battle' ? `
+              <button onclick="event.stopPropagation(); startBattleChallenge(${u.id})" class="px-3 py-1.5 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-bold text-[10px] rounded-lg shadow-md transition-all flex items-center gap-1 shrink-0">
+                ⚔️ Jang
+              </button>
+            ` : (isClose ? '<i class="fa-solid fa-star text-amber-400 text-xs shrink-0"></i>' : '')}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectUserToChat(userId) {
+      selectedChatUser = mockUsers.find(u => u.id === userId);
+      if (!selectedChatUser) return;
+
+      document.getElementById('chatUserAvatar').textContent = selectedChatUser.avatar;
+      document.getElementById('chatUserName').textContent = `${selectedChatUser.name} (@${selectedChatUser.nickname})`;
+      document.getElementById('chatUserStatus').textContent = `${selectedChatUser.isOnline ? '● Onlayn' : '○ Oflayn'} • ${selectedChatUser.email}`;
+      document.getElementById('chatUserStatus').className = `text-[11px] ${selectedChatUser.isOnline ? 'text-emerald-400' : 'text-slate-500'}`;
+
+      document.getElementById('chatInput').disabled = false;
+      document.getElementById('chatSendBtn').disabled = false;
+
+      const subBtn = document.getElementById('subCloseFriendBtn');
+      const subBtnText = document.getElementById('subBtnText');
+      subBtn.classList.remove('hidden');
+
+      if (closeFriendsIds.includes(selectedChatUser.id)) {
+        subBtnText.textContent = "Yaqin do'stlardan chiqarish";
+        subBtn.className = "px-3.5 py-1.5 bg-amber-500 text-slate-950 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5";
+      } else {
+        subBtnText.textContent = "Yaqin do'st deb saqlash";
+        subBtn.className = "px-3.5 py-1.5 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5";
+      }
+
+      renderFriendsList();
+      renderChatMessages();
+    }
+
+    function toggleSubscribeActiveUser() {
+      if (!selectedChatUser) return;
+      const idx = closeFriendsIds.indexOf(selectedChatUser.id);
+      if (idx > -1) {
+        closeFriendsIds.splice(idx, 1);
+        showToast(`${selectedChatUser.name} yaqin do'stlardan chiqarildi`, "info");
+      } else {
+        closeFriendsIds.push(selectedChatUser.id);
+        showToast(`${selectedChatUser.name} yaqin do'st sifatida saqlandi ⭐`, "success");
+      }
+      localStorage.setItem('close_friends_ids', JSON.stringify(closeFriendsIds));
+      selectUserToChat(selectedChatUser.id);
+    }
+
+    function renderChatMessages() {
+      if (!selectedChatUser) return;
+      const msgArea = document.getElementById('chatMessagesArea');
+      const history = chatHistories[selectedChatUser.id] || [];
+
+      if (history.length === 0) {
+        msgArea.innerHTML = `<div class="text-center text-xs text-slate-500 my-auto py-10">${selectedChatUser.name} bilan suhbatni boshlang 👋</div>`;
+        return;
+      }
+
+      msgArea.innerHTML = history.map(msg => `
+        <div class="flex flex-col ${msg.fromMe ? 'items-end' : 'items-start'}">
+          <div class="max-w-[80%] px-3.5 py-2.5 rounded-2xl text-xs sm:text-sm leading-relaxed ${msg.fromMe ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-br-sm shadow-md' : 'bg-slate-800/90 text-slate-100 border border-slate-700/80 rounded-bl-sm'}">
+            ${escapeHtml(msg.text)}
+          </div>
+          <span class="font-mono text-[9px] text-slate-500 mt-1 px-1">${msg.time}</span>
+        </div>
+      `).join('');
+
+      msgArea.scrollTop = msgArea.scrollHeight;
+    }
+
+    function sendChatMessage(event) {
+      event.preventDefault();
+      if (!selectedChatUser) return;
+
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      if (!chatHistories[selectedChatUser.id]) {
+        chatHistories[selectedChatUser.id] = [];
+      }
+
+      const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      chatHistories[selectedChatUser.id].push({ text, fromMe: true, time: now });
+
+      localStorage.setItem('chat_histories', JSON.stringify(chatHistories));
+      input.value = "";
+      renderChatMessages();
+
+      if (selectedChatUser.isOnline) {
+        const targetUser = selectedChatUser;
+        setTimeout(() => {
+          chatHistories[targetUser.id].push({
+            text: `Salom! Xabaringizni oldim: "${text}"`,
+            fromMe: false,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          });
+          localStorage.setItem('chat_histories', JSON.stringify(chatHistories));
+          if (selectedChatUser && selectedChatUser.id === targetUser.id) {
+            renderChatMessages();
+          }
+        }, 1100);
+      }
+    }
+
+    function resetChatArea() {
+      document.getElementById('chatUserAvatar').textContent = "?";
+      document.getElementById('chatUserName').textContent = "Suhbatdoshni tanlang";
+      document.getElementById('chatUserStatus').textContent = "---";
+      document.getElementById('subCloseFriendBtn').classList.add('hidden');
+      document.getElementById('chatInput').disabled = true;
+      document.getElementById('chatSendBtn').disabled = true;
+      document.getElementById('chatMessagesArea').innerHTML = `<div class="text-center text-xs text-slate-500 my-auto py-10">Muloqotni boshlash uchun chap tarafdan do'stingizni tanlang</div>`;
+    }
+
+    // --- MASHQ BOTI & JANG ARENASI ---
+    function startBotPracticeBattle() {
+      isBotPracticeMode = true;
+      battleOpponent = { id: 999, name: "🤖 Mashq Boti (@ustoz_bot)", isBot: true };
+
+      const totem = document.getElementById('totemOverlay');
+      totem.classList.add('active');
+
+      setTimeout(() => {
+        totem.classList.remove('active');
+        openBattleArena();
+        showToast("Mashq Boti bilan jang boshlandi! Tez va xatosiz yozing.", "info");
+      }, 1250);
+    }
+
+    function startBattleChallenge(userId) {
+      isBotPracticeMode = false;
+      battleOpponent = mockUsers.find(u => u.id === userId);
+      if (!battleOpponent) return;
+
+      const toast = document.getElementById('battleChallengeToast');
+      document.getElementById('challengeSenderName').textContent = `${battleOpponent.name} sizni jangga chaqirdi!`;
+      
+      const timerBar = document.getElementById('challengeTimerBar');
+      timerBar.style.transition = 'none';
+      timerBar.style.width = '100%';
+
+      toast.classList.remove('pointer-events-none', 'translate-y-24', 'opacity-0');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          timerBar.style.transition = 'width 10s linear';
+          timerBar.style.width = '0%';
+        }, 30);
+      });
+
+      battleTimeRemaining = 10;
+      clearInterval(battleTimerInterval);
+
+      battleTimerInterval = setInterval(() => {
+        battleTimeRemaining--;
+        if (battleTimeRemaining <= 0) {
+          clearInterval(battleTimerInterval);
+          closeBattleToast();
+          showToast("Vaqt tugadi — raqib kutishdan charchadi! 😎", "warning");
+        }
+      }, 1000);
+    }
+
+    function respondChallenge(accepted) {
+      clearInterval(battleTimerInterval);
+      closeBattleToast();
+
+      if (accepted) {
+        const totem = document.getElementById('totemOverlay');
+        totem.classList.add('active');
+
+        setTimeout(() => {
+          totem.classList.remove('active');
+          openBattleArena();
+        }, 1450);
+      } else {
+        showToast("Jang taklifi rad etildi 😕", "info");
+      }
+    }
+
+    function closeBattleToast() {
+      const toast = document.getElementById('battleChallengeToast');
+      toast.classList.add('pointer-events-none', 'translate-y-24', 'opacity-0');
+      toast.classList.remove('opacity-100', 'translate-y-0');
+    }
+
+    function openBattleArena() {
+      battleSampleText = battleSampleTexts[Math.floor(Math.random() * battleSampleTexts.length)];
+      const modal = document.getElementById('battleArenaModal');
+
+      document.getElementById('battleOpponentInfo').textContent = `Raqib: ${battleOpponent ? battleOpponent.name : 'Do\'st'}`;
+      document.getElementById('battleInputText').value = "";
+      document.getElementById('myBattleScore').textContent = "100 / 100";
+      document.getElementById('oppBattleScore').textContent = "Yozmoqda...";
+      document.getElementById('liveAccuracyBadge').textContent = "Aniqlik: 100%";
+      document.getElementById('battleResultModal').classList.add('opacity-0', 'pointer-events-none');
+
+      renderLiveSampleHighlighting("");
+
+      battle5MinTimeRemaining = 300;
+      update5MinTimerDisplay();
+      clearInterval(battle5MinInterval);
+      
+      battle5MinInterval = setInterval(() => {
+        battle5MinTimeRemaining--;
+        update5MinTimerDisplay();
+        if (battle5MinTimeRemaining <= 0) {
+          clearInterval(battle5MinInterval);
+          finishBattleMatch();
+        }
+      }, 1000);
+
+      modal.classList.add('open');
+      setTimeout(() => document.getElementById('battleInputText').focus(), 200);
+    }
+
+    function update5MinTimerDisplay() {
+      const minutes = Math.floor(battle5MinTimeRemaining / 60);
+      const seconds = battle5MinTimeRemaining % 60;
+      document.getElementById('battle5MinTimer').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    function renderLiveSampleHighlighting(typed) {
+      const container = document.getElementById('sampleBattleText');
+      container.innerHTML = battleSampleText.split('').map((ch, idx) => {
+        if (idx >= typed.length) {
+          return `<span class="text-slate-300">${escapeHtml(ch)}</span>`;
+        } else if (typed[idx] === ch) {
+          return `<span class="text-emerald-400 bg-emerald-500/10 rounded">${escapeHtml(ch)}</span>`;
+        } else {
+          return `<span class="text-red-400 bg-red-500/25 underline rounded">${escapeHtml(ch)}</span>`;
+        }
+      }).join('');
+    }
+
+    function checkBattleTyping() {
+      const input = document.getElementById('battleInputText').value;
+      const sample = battleSampleText;
+      let errors = 0;
+
+      for (let i = 0; i < input.length; i++) {
+        if (i >= sample.length || input[i] !== sample[i]) {
+          errors++;
+        }
+      }
+
+      renderLiveSampleHighlighting(input);
+
+      const score = Math.max(0, 100 - (errors * 5));
+      const accuracy = input.length > 0 ? Math.max(0, Math.round(((input.length - errors) / input.length) * 100)) : 100;
+
+      document.getElementById('myBattleScore').textContent = `${score} / 100`;
+      document.getElementById('liveAccuracyBadge').textContent = `Aniqlik: ${accuracy}%`;
+    }
+
+    function finishBattleMatch() {
+      clearInterval(battle5MinInterval);
+
+      const input = document.getElementById('battleInputText').value;
+      const sample = battleSampleText;
+      let totalErrors = 0;
+
+      for (let i = 0; i < sample.length; i++) {
+        if (i >= input.length || input[i] !== sample[i]) {
+          totalErrors++;
+        }
+      }
+
+      if (input.length > sample.length) {
+        totalErrors += (input.length - sample.length);
+      }
+
+      const myScore = Math.max(0, 100 - (totalErrors * 5));
+      const oppScore = isBotPracticeMode
+        ? Math.floor(Math.random() * 14) + 82
+        : Math.floor(Math.random() * 21) + 75;
+
+      document.getElementById('myBattleScore').textContent = `${myScore} / 100`;
+      document.getElementById('oppBattleScore').textContent = `${oppScore} / 100`;
+
+      const errorDetailsContainer = document.getElementById('battleErrorDetails');
+      if (totalErrors === 0 && input.length === sample.length) {
+        errorDetailsContainer.innerHTML = `<p class="text-emerald-400 font-bold">✨ Mukammal! Birorta ham imlo xatosi qilinmadi.</p>`;
+      } else {
+        errorDetailsContainer.innerHTML = `
+          <p class="text-red-400 mb-2 font-semibold">Jami xatolar / yetishmagan belgilar: ${totalErrors} ta (-${totalErrors * 5} ball)</p>
+          <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono text-xs leading-relaxed">
+            ${sample.split('').map((ch, idx) => {
+              if (idx >= input.length) {
+                return `<span class="bg-amber-500/25 text-amber-300 underline font-bold" title="Kiritilmadi">[${escapeHtml(ch)}]</span>`;
+              } else if (input[idx] !== ch) {
+                return `<span class="bg-red-500/35 text-red-300 line-through font-bold" title="To'g'risi: ${escapeHtml(ch)}">${escapeHtml(input[idx])}</span>`;
+              }
+              return `<span class="text-emerald-400">${escapeHtml(ch)}</span>`;
+            }).join('')}
+          </div>
+        `;
+      }
+
+      const resultModal = document.getElementById('battleResultModal');
+      const title = document.getElementById('resultTitle');
+      const desc = document.getElementById('resultDesc');
+      const icon = document.getElementById('resultIcon');
+
+      if (myScore === oppScore) {
+        icon.textContent = "🏆";
+        title.textContent = "Durrang! Sizdan zo'ri yo'q!";
+        desc.textContent = `Ikkala o'yinchi ham bir xil ${myScore} ball to'pladi.`;
+      } else if (myScore > oppScore) {
+        icon.textContent = "🥇";
+        title.textContent = "Tabriklaymiz! Siz g'olib bo'ldingiz!";
+        desc.textContent = `Siz ${myScore} ball to'plab, ${oppScore} ball olgan raqibingizni yengdingiz!`;
+      } else {
+        icon.textContent = "🥊";
+        title.textContent = "Raqib g'olib bo'ldi!";
+        desc.textContent = `Raqib ${oppScore} ball to'pladi, siz esa ${myScore} ball oldingiz. Yana mashq qiling!`;
+      }
+
+      resultModal.classList.remove('pointer-events-none', 'opacity-0');
+      resultModal.classList.add('opacity-100');
+    }
+
+    function closeBattleResultModal() {
+      document.getElementById('battleResultModal').classList.add('opacity-0', 'pointer-events-none');
+      quitBattleArena(false);
+    }
+
+    function quitBattleArena(goToMain = false) {
+      clearInterval(battle5MinInterval);
+      document.getElementById('battleArenaModal').classList.remove('open');
+
+      if (goToMain) {
+        triggerVortexTransition('menuChat', 'step4');
+      } else {
+        initChatModule();
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>
